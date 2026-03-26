@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Libro } from "@/lib/types";
 import { aggiornaLibro, eliminaLibro, getRpcErrorMessage } from "@/lib/rpc";
-import { BadgeGenere } from "@/components/BadgeGenere";
+import BadgeGenere from "@/components/BadgeGenere";
 import { Button } from "@/components/ui/button";
 import { Trash2, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
 import Link from "next/link";
