@@ -55,6 +55,16 @@ export default async function LibroPage({ params, searchParams }: Props) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+  const shareText =
+    'Ho appena aggiunto "' +
+    libro.titolo +
+    '" di ' +
+    libro.autore +
+    " al catalogo di Libri in Giro BCN! Disponibile a " +
+    (libro.barrio ?? "Barcellona") +
+    " → " +
+    siteUrl + "/libro/" + libro.id;
+
   const shareUrl =
     "https://t.me/share/url?url=" +
     encodeURIComponent(siteUrl + "/libro/" + libro.id) +
@@ -67,6 +77,9 @@ export default async function LibroPage({ params, searchParams }: Props) {
         " al catalogo di Libri in Giro BCN! Disponibile a " +
         (libro.barrio ?? "Barcellona"),
     );
+
+  const shareWhatsappUrl =
+    "https://wa.me/?text=" + encodeURIComponent(shareText);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -103,7 +116,16 @@ export default async function LibroPage({ params, searchParams }: Props) {
                 rel="noopener noreferrer"
                 className="text-sm text-[#3B6D11] underline underline-offset-2 hover:no-underline"
               >
-                Condividi nel gruppo Telegram
+                Condividi su Telegram
+              </a>
+              <span className="text-gray-300">|</span>
+              <a
+                href={shareWhatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#3B6D11] underline underline-offset-2 hover:no-underline"
+              >
+                Condividi su WhatsApp
               </a>
             </div>
           </div>
