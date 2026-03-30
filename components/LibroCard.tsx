@@ -1,19 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Libro } from "@/lib/types";
+import { Libro, GENERE_STYLE } from "@/lib/types";
 import BadgeGenere from "./BadgeGenere";
 import { MapPin } from "lucide-react";
-
-const GENERE_STYLE: Record<string, { bg: string; text: string }> = {
-  Narrativa: { bg: "#EAF3DE", text: "#27500A" },
-  Saggistica: { bg: "#E6F1FB", text: "#0C447C" },
-  "Gialli / Thriller": { bg: "#FAEEDA", text: "#633806" },
-  "Romanzo storico": { bg: "#EEEDFE", text: "#3C3489" },
-  "Fantasy / Fantascienza": { bg: "#FAECE7", text: "#712B13" },
-  Poesia: { bg: "#FBEAF0", text: "#72243E" },
-  "Bambini / Ragazzi": { bg: "#E1F5EE", text: "#085041" },
-  Altro: { bg: "#F1EFE8", text: "#444441" },
-};
 
 interface LibroCardProps {
   libro: Libro;
