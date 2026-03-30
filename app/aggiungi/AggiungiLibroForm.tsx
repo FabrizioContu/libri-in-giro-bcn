@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 import { BookPlus, AlertTriangle } from "lucide-react";
 
 export function AggiungiLibroForm() {
@@ -223,6 +224,15 @@ export function AggiungiLibroForm() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Privacy notice */}
+      <p className="text-xs text-gray-400 -mt-2 px-1">
+        Il tuo contatto sarà visibile nella pagina pubblica del libro per permettere ai lettori di
+        contattarti.{" "}
+        <Link href="/privacy" className="underline underline-offset-2 hover:text-gray-600">
+          Privacy
+        </Link>
+      </p>
 
       {/* Optional fields */}
       <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">

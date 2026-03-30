@@ -31,8 +31,13 @@ export default async function HomePage() {
         <CatalogClient libri={libri} />
       </main>
       <footer className="border-t border-gray-100 bg-white py-6 mt-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-sm text-gray-400">
-          Libri in Giro BCN &mdash; Comunità italiana di Barcellona
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-sm text-gray-400 space-y-1">
+          <p>Libri in Giro BCN &mdash; Comunità italiana di Barcellona</p>
+          <p>
+            <a href="/privacy" className="hover:text-gray-600 underline underline-offset-2 transition-colors">
+              Privacy
+            </a>
+          </p>
         </div>
       </footer>
     </div>
