@@ -22,8 +22,9 @@ interface LoVoglioFormProps {
 }
 
 export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
-  const [tab, setTab] = useState<"telegram" | "altro">("telegram");
+  const [tab, setTab] = useState<"telegram" | "whatsapp" | "altro">("telegram");
   const [telegramUsername, setTelegramUsername] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
   const [altroContatto, setAltroContatto] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [nodoRitiro, setNodoRitiro] = useState("");
@@ -49,9 +50,15 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         ? telegramUsername.startsWith("@")
           ? telegramUsername
           : "@" + telegramUsername
+        : tab === "whatsapp"
+        ? whatsappNumber.replace(/\s+/g, "").replace(/^\+/, "")
         : altroContatto;
 
-    if (!contatto.trim() || (tab === "telegram" && contatto.trim() === "@")) {
+    if (
+      !contatto.trim() ||
+      (tab === "telegram" && contatto.trim() === "@") ||
+      (tab === "whatsapp" && contatto.replace(/\D/g, "").length < 8)
+    ) {
       setError("Inserisci il tuo contatto per procedere.");
       return;
     }
@@ -175,10 +182,13 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         <Label className="text-base font-semibold text-gray-900">
           Come possiamo contattarti?
         </Label>
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "telegram" | "altro")}>
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "telegram" | "whatsapp" | "altro")}>
           <TabsList className="w-full">
             <TabsTrigger value="telegram" className="flex-1">
               Telegram
+            </TabsTrigger>
+            <TabsTrigger value="whatsapp" className="flex-1">
+              WhatsApp
             </TabsTrigger>
             <TabsTrigger value="altro" className="flex-1">
               Altro
@@ -198,9 +208,27 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
               />
             </div>
           </TabsContent>
+          <TabsContent value="whatsapp">
+            <div className="relative mt-2">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium select-none">
+                +
+              </span>
+              <Input
+                placeholder="34 612 345 678"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                className="pl-7"
+                autoComplete="tel"
+                inputMode="tel"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Includi il prefisso internazionale, es. 34 per la Spagna
+            </p>
+          </TabsContent>
           <TabsContent value="altro">
             <Input
-              placeholder="WhatsApp, email, o come preferisci essere contattato"
+              placeholder="Email, o come preferisci essere contattato"
               value={altroContatto}
               onChange={(e) => setAltroContatto(e.target.value)}
               className="mt-2"
