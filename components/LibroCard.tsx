@@ -20,8 +20,6 @@ interface LibroCardProps {
 }
 
 export function LibroCard({ libro }: LibroCardProps) {
-  const cognome = libro.autore.trim().split(" ").pop() ?? libro.autore;
-  const initial = cognome.charAt(0).toUpperCase();
   const stile = GENERE_STYLE[libro.genere ?? ""] ?? GENERE_STYLE["Altro"];
 
   return (
@@ -44,13 +42,21 @@ export function LibroCard({ libro }: LibroCardProps) {
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span
-                className="text-5xl font-bold select-none"
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center gap-1.5">
+              <div className="w-6 h-px mb-1" style={{ background: stile.text, opacity: 0.35 }} />
+              <p
+                className="text-[11px] font-bold leading-tight line-clamp-4 uppercase tracking-widest px-2 select-none"
                 style={{ color: stile.text }}
               >
-                {initial}
-              </span>
+                {libro.titolo}
+              </p>
+              <div className="w-6 h-px my-1" style={{ background: stile.text, opacity: 0.35 }} />
+              <p
+                className="text-[10px] leading-tight line-clamp-2 select-none"
+                style={{ color: stile.text, opacity: 0.65 }}
+              >
+                {libro.autore}
+              </p>
             </div>
           )}
         </div>
