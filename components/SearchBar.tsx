@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useTransition } from "react";
 import { Search, X } from "lucide-react";
-import { Libro, Genere, Barrio, GENERI, BARRIOS } from "@/lib/types";
+import { Libro, Genere, Barrio, GENERI, BARRIOS, GENERE_STYLE, GENERE_EMOJI } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
@@ -85,24 +85,46 @@ export function SearchBar({ libri, onFilter }: SearchBarProps) {
 
       {/* Genre chips */}
       <div className="space-y-2">
-        <div className="flex flex-wrap gap-1.5">
-          {GENERI.map((genere) => (
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Genere</span>
+          {hasFilters && (
             <button
-              key={genere}
-              onClick={() => handleGenereToggle(genere)}
-              className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
-                selectedGenere === genere
-                  ? "bg-[#3B6D11] text-white border-[#3B6D11] shadow-sm"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#3B6D11] hover:text-[#3B6D11]"
-              )}
+              onClick={clearAll}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {genere}
+              Rimuovi filtri
             </button>
-          ))}
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {GENERI.map((genere) => {
+            const style = GENERE_STYLE[genere] ?? GENERE_STYLE["Altro"];
+            const emoji = GENERE_EMOJI[genere] ?? "📚";
+            const isSelected = selectedGenere === genere;
+            return (
+              <button
+                key={genere}
+                onClick={() => handleGenereToggle(genere)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
+                  !isSelected && "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
+                )}
+                style={isSelected ? {
+                  background: style.bg,
+                  color: style.text,
+                  borderColor: style.text + "50",
+                } : {}}
+              >
+                {emoji} {genere}
+              </button>
+            );
+          })}
         </div>
 
         {/* Barrio chips */}
+        <div className="flex items-center mt-1">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Quartiere</span>
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {BARRIOS.map((barrio) => (
             <button
@@ -112,20 +134,12 @@ export function SearchBar({ libri, onFilter }: SearchBarProps) {
                 "px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
                 selectedBarrio === barrio
                   ? "bg-[#3B6D11] text-white border-[#3B6D11] shadow-sm"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-[#3B6D11] hover:text-[#3B6D11]"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
               )}
             >
               📍 {barrio}
             </button>
           ))}
-          {hasFilters && (
-            <button
-              onClick={clearAll}
-              className="px-3 py-1 rounded-full text-xs font-medium text-gray-500 hover:text-gray-700 border border-dashed border-gray-300 hover:border-gray-400 transition-all"
-            >
-              Rimuovi filtri
-            </button>
-          )}
         </div>
       </div>
     </div>

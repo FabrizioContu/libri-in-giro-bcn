@@ -83,6 +83,28 @@ export const BARRIOS: Barrio[] = [
   "Altro",
 ];
 
+export const GENERE_STYLE: Record<string, { bg: string; text: string }> = {
+  Narrativa:               { bg: "#EAF3DE", text: "#27500A" },
+  Saggistica:              { bg: "#E6F1FB", text: "#0C447C" },
+  "Gialli / Thriller":     { bg: "#FAEEDA", text: "#633806" },
+  "Romanzo storico":       { bg: "#EEEDFE", text: "#3C3489" },
+  "Fantasy / Fantascienza":{ bg: "#FAECE7", text: "#712B13" },
+  Poesia:                  { bg: "#FBEAF0", text: "#72243E" },
+  "Bambini / Ragazzi":     { bg: "#E1F5EE", text: "#085041" },
+  Altro:                   { bg: "#F1EFE8", text: "#444441" },
+};
+
+export const GENERE_EMOJI: Record<string, string> = {
+  Narrativa:                "📖",
+  "Romanzo storico":        "🏛️",
+  Saggistica:               "🔬",
+  "Gialli / Thriller":      "🔍",
+  "Fantasy / Fantascienza": "⚡",
+  Poesia:                   "✨",
+  "Bambini / Ragazzi":      "🧸",
+  Altro:                    "📚",
+};
+
 export const NODI_RITIRO: string[] = [
   "Gràcia - Plaça del Diamant",
   "Gràcia - Carrer de Verdi",
