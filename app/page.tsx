@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Libro } from "@/lib/types";
 import { Header } from "@/components/Header";
+import { HeroIntro } from "@/components/HeroIntro";
 import { CatalogClient } from "./CatalogClient";
 
 async function getLibri(): Promise<Libro[]> {
@@ -25,6 +26,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <HeroIntro />
       <main className="flex-1">
         <CatalogClient libri={libri} />
       </main>
