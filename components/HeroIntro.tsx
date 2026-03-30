@@ -3,8 +3,8 @@ import { BookPlus, Search, Handshake } from "lucide-react";
 import { ElementType } from "react";
 
 const steps: { icon: ElementType; label: string; sub: string }[] = [
-  { icon: BookPlus,  label: "Aggiungi", sub: "il tuo libro" },
-  { icon: Search,    label: "Trova",    sub: "un libro" },
+  { icon: BookPlus, label: "Aggiungi", sub: "il tuo libro" },
+  { icon: Search, label: "Trova", sub: "un libro" },
   { icon: Handshake, label: "Prendilo", sub: "in prestito" },
 ];
 
@@ -15,7 +15,7 @@ export function HeroIntro() {
         <p className="text-center text-gray-500 text-base sm:text-lg mb-8">
           Scambia libri con la comunità italiana di Barcellona
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-0">
+        <div className="flex flex-row items-center justify-center gap-4 ">
           {steps.map(({ icon: Icon, label, sub }, i) => (
             <Fragment key={label}>
               <div className="flex flex-col items-center gap-2 px-6">

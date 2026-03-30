@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 import { Send, Copy, Check, ExternalLink } from "lucide-react";
 
 interface LoVoglioFormProps {
@@ -236,6 +237,13 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
             />
           </TabsContent>
         </Tabs>
+        <p className="text-xs text-gray-400 pt-1">
+          Il tuo contatto sarà condiviso solo con il proprietario del libro per organizzare il
+          prestito.{" "}
+          <Link href="/privacy" className="underline underline-offset-2 hover:text-gray-600">
+            Privacy
+          </Link>
+        </p>
       </div>
 
       <div className="space-y-1.5">
