@@ -19,7 +19,7 @@ export function LibroDetailClient({ libro, activeLoan }: LibroDetailClientProps)
           Questo libro è attualmente in prestito.
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          Torna a controllare piu tardi o esplora altri libri nel catalogo.
+          Torna a controllare più tardi o esplora altri libri nel catalogo.
         </p>
       </div>
     );

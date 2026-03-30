@@ -40,11 +40,11 @@ export function AggiungiLibroForm() {
 
     // Validation
     if (!form.titolo.trim()) {
-      setError("Il titolo e obbligatorio.");
+      setError("Il titolo è obbligatorio.");
       return;
     }
     if (!form.autore.trim()) {
-      setError("Il nome dell autore e obbligatorio.");
+      setError("Il nome dell'autore è obbligatorio.");
       return;
     }
     if (!form.genere) {
@@ -93,7 +93,7 @@ export function AggiungiLibroForm() {
       router.push("/libro/" + data.id + "?nuovo=true");
     } catch (err: unknown) {
       console.error(err);
-      setError("Si e verificato un errore durante l inserimento. Riprova.");
+      setError("Si è verificato un errore durante l'inserimento. Riprova.");
       setLoading(false);
     }
   };
@@ -248,7 +248,7 @@ export function AggiungiLibroForm() {
             onChange={(e) => setForm((f) => ({ ...f, copertina: e.target.value }))}
           />
           <p className="text-xs text-gray-400">
-            Incolla un link diretto all immagine della copertina.
+            Incolla un link diretto all'immagine della copertina.
           </p>
         </div>
 

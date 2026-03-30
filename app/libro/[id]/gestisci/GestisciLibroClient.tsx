@@ -122,10 +122,10 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
       {/* Availability toggle */}
       <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-100 shadow-sm">
         <div>
-          <p className="font-semibold text-gray-900 text-sm">Disponibilita</p>
+          <p className="font-semibold text-gray-900 text-sm">Disponibilità</p>
           <p className="text-xs text-gray-500 mt-0.5">
             {form.disponibile
-              ? "Il libro e visibile nel catalogo"
+              ? "Il libro è visibile nel catalogo"
               : "Il libro non appare nel catalogo"}
           </p>
         </div>

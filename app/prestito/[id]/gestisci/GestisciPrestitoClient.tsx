@@ -162,7 +162,7 @@ export function GestisciPrestitoClient({
       {stato === "confermato" && (
         <div className="space-y-3">
           <p className="text-sm text-gray-600">
-            Il prestito e confermato. Quando hai consegnato il libro al richiedente,
+            Il prestito è confermato. Quando hai consegnato il libro al richiedente,
             segna il ritiro.
           </p>
           <Button
@@ -186,7 +186,7 @@ export function GestisciPrestitoClient({
       {stato === "in_corso" && (
         <div className="space-y-3">
           <p className="text-sm text-gray-600">
-            Il libro e in prestito. Quando ti viene restituito, segna la restituzione.
+            Il libro è in prestito. Quando ti viene restituito, segna la restituzione.
           </p>
           <Button
             onClick={() => handleAction("restituito")}
@@ -208,7 +208,7 @@ export function GestisciPrestitoClient({
       {stato === "scaduto" && (
         <div className="space-y-3">
           <p className="text-sm text-[#A32D2D] bg-red-50 border border-red-100 p-3 rounded-xl">
-            Questo prestito e scaduto. Se il libro e stato restituito, segna la
+            Questo prestito è scaduto. Se il libro è stato restituito, segna la
             restituzione.
           </p>
           <Button
