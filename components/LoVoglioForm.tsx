@@ -121,7 +121,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       });
     } catch (err: unknown) {
       console.error(err);
-      setError("Si e verificato un errore. Riprova tra qualche secondo.");
+      setError("Si è verificato un errore. Riprova tra qualche secondo.");
     } finally {
       setLoading(false);
     }
