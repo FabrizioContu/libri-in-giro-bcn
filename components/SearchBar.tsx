@@ -96,7 +96,7 @@ export function SearchBar({ libri, onFilter }: SearchBarProps) {
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {GENERI.map((genere) => {
             const style = GENERE_STYLE[genere] ?? GENERE_STYLE["Altro"];
             const emoji = GENERE_EMOJI[genere] ?? "📚";
@@ -106,13 +106,16 @@ export function SearchBar({ libri, onFilter }: SearchBarProps) {
                 key={genere}
                 onClick={() => handleGenereToggle(genere)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
-                  !isSelected && "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
+                  "px-4 py-2 rounded-full text-sm font-semibold transition-all duration-150 border",
+                  isSelected
+                    ? "shadow-md scale-[1.04]"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:shadow-sm hover:scale-[1.02]"
                 )}
                 style={isSelected ? {
                   background: style.bg,
                   color: style.text,
-                  borderColor: style.text + "50",
+                  borderColor: style.text + "40",
+                  boxShadow: `0 2px 8px ${style.text}25`,
                 } : {}}
               >
                 {emoji} {genere}
@@ -125,17 +128,18 @@ export function SearchBar({ libri, onFilter }: SearchBarProps) {
         <div className="flex items-center mt-1">
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Quartiere</span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {BARRIOS.map((barrio) => (
             <button
               key={barrio}
               onClick={() => handleBarrioToggle(barrio)}
               className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
+                "px-4 py-2 rounded-full text-sm font-semibold transition-all duration-150 border",
                 selectedBarrio === barrio
-                  ? "bg-[#3B6D11] text-white border-[#3B6D11] shadow-sm"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
+                  ? "bg-[#3B6D11] text-white border-[#3B6D11] shadow-md scale-[1.04]"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:shadow-sm hover:scale-[1.02]"
               )}
+              style={selectedBarrio === barrio ? { boxShadow: "0 2px 8px #3B6D1130" } : {}}
             >
               📍 {barrio}
             </button>
