@@ -157,15 +157,22 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
           {(successData.telegramUrl || successData.whatsappUrl) ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
-                Avvisa il proprietario — riceverà il tuo contatto e potrà risponderti.
+                Avvisa il proprietario — il messaggio include già il tuo contatto, potrà risponderti direttamente.
               </p>
               {successData.telegramUrl && (
-                <Button asChild className="w-full" size="lg">
-                  <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4" />
-                    Notifica su Telegram
-                  </a>
-                </Button>
+                <>
+                  <Button asChild className="w-full" size="lg">
+                    <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="w-4 h-4" />
+                      Notifica su Telegram
+                    </a>
+                  </Button>
+                  {successData.richiedenteTab === "whatsapp" && (
+                    <p className="text-xs text-gray-400">
+                      Si aprirà Telegram con un messaggio pre-compilato. Il tuo numero WhatsApp è già incluso.
+                    </p>
+                  )}
+                </>
               )}
               {successData.whatsappUrl && (
                 <Button asChild className="w-full" size="lg" variant={successData.telegramUrl ? "outline" : "default"}>
