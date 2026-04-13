@@ -96,6 +96,19 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
 
       const ownerHasTelegram = !!libro.telegram;
 
+      // Notifica automatica via bot se il proprietario ha attivato le notifiche
+      fetch("/api/telegram/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          libroId: libro.id,
+          prestitoId,
+          richiedenteContatto: contatto,
+          richiedenteTipo: tab,
+          manageUrl,
+        }),
+      }).catch(() => {/* non bloccare il flusso */});
+
       // Messaggio base — include sempre il contatto del richiedente
       const contattoLabel =
         tab === "telegram"

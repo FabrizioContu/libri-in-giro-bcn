@@ -227,6 +227,18 @@ export function AggiungiLibroForm() {
             <p className="text-xs text-gray-400 mt-1.5">
               Il tuo nome profilo non sarà visibile — solo il link al tuo Telegram.
             </p>
+            <p className="text-xs text-[#3B6D11] mt-1.5 font-medium">
+              Per ricevere notifiche automatiche quando qualcuno richiede il tuo libro,{" "}
+              <a
+                href="https://t.me/LibriInGiroBot?start=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2"
+              >
+                avvia @LibriInGiroBot
+              </a>
+              .
+            </p>
           </TabsContent>
           <TabsContent value="altro">
             <div className="relative mt-2">
