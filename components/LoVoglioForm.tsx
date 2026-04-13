@@ -36,6 +36,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
     manageUrl: string;
     richiedenteTab: "telegram" | "whatsapp";
     ownerHasTelegram: boolean;
+    notifySent: boolean;
     telegramUrl?: string;
     whatsappUrl?: string;
   } | null>(null);
@@ -97,17 +98,22 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       const ownerHasTelegram = !!libro.telegram;
 
       // Notifica automatica via bot se il proprietario ha attivato le notifiche
-      fetch("/api/telegram/notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          libroId: libro.id,
-          prestitoId,
-          richiedenteContatto: contatto,
-          richiedenteTipo: tab,
-          manageUrl,
-        }),
-      }).catch(() => {/* non bloccare il flusso */});
+      let notifySent = false;
+      try {
+        const notifyRes = await fetch("/api/telegram/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            libroId: libro.id,
+            prestitoId,
+            richiedenteContatto: contatto,
+            richiedenteTipo: tab,
+            manageUrl,
+          }),
+        });
+        const notifyData = await notifyRes.json();
+        notifySent = notifyData.ok === true;
+      } catch { /* non bloccare il flusso */ }
 
       // Messaggio base — include sempre il contatto del richiedente
       const contattoLabel =
@@ -144,6 +150,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         manageUrl,
         richiedenteTab: tab,
         ownerHasTelegram,
+        notifySent,
         telegramUrl,
         whatsappUrl,
       });
@@ -167,7 +174,11 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20">
           <p className="font-semibold text-[#3B6D11] mb-1">Richiesta inviata!</p>
-          {(successData.telegramUrl || successData.whatsappUrl) ? (
+          {successData.notifySent ? (
+            <p className="text-sm text-gray-700">
+              Il proprietario ha ricevuto una notifica automatica su Telegram con il tuo contatto.
+            </p>
+          ) : (successData.telegramUrl || successData.whatsappUrl) ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
                 Avvisa il proprietario — il messaggio include già il tuo contatto, potrà risponderti direttamente.
