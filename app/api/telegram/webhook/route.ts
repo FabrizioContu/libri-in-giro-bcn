@@ -23,6 +23,11 @@ export async function POST(req: NextRequest) {
       .from("libri")
       .update({ telegram_chat_id: chatId })
       .ilike("telegram", username);
+    // Aggiorna telegram_chat_id tramite RPC con SECURITY DEFINER (bypassa RLS)
+    await supabase.rpc("set_telegram_chat_id", {
+      p_username: username,
+      p_chat_id: chatId,
+    });
 
     // Risposta di conferma al proprietario
     await fetch(
