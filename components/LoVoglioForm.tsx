@@ -95,31 +95,34 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       const manageUrl = siteUrl + "/prestito/" + prestitoId + "/gestisci?token=" + editToken;
 
       const ownerHasTelegram = !!libro.telegram;
+
+      // Messaggio base — include sempre il contatto del richiedente
+      const contattoLabel =
+        tab === "telegram"
+          ? "Telegram: " + contatto
+          : "WhatsApp: +" + contatto;
+
+      const testoBase =
+        "Ciao! Qualcuno vuole prendere in prestito \"" +
+        libro.titolo +
+        "\" di " +
+        libro.autore +
+        ". Contattalo su " +
+        contattoLabel +
+        ". Gestisci la richiesta qui: " +
+        manageUrl;
+
+      // Genera sempre tutti i link disponibili verso il proprietario
       let telegramUrl: string | undefined;
       let whatsappUrl: string | undefined;
 
-      if (ownerHasTelegram && libro.telegram) {
+      if (libro.telegram) {
         const tgUsername = libro.telegram.replace(/^@/, "");
-        const testo =
-          "Ciao! Vorrei prendere in prestito \"" +
-          libro.titolo +
-          "\" di " +
-          libro.autore +
-          ". Contattami: " +
-          contatto +
-          ". Conferma qui: " +
-          manageUrl;
-        telegramUrl = "https://t.me/" + tgUsername + "?text=" + encodeURIComponent(testo);
-      } else if (libro.contatto_alternativo) {
+        telegramUrl = "https://t.me/" + tgUsername + "?text=" + encodeURIComponent(testoBase);
+      }
+      if (libro.contatto_alternativo) {
         const numero = libro.contatto_alternativo.replace(/\D/g, "");
-        const testo =
-          "Ciao! Vorrei prendere in prestito \"" +
-          libro.titolo +
-          "\" di " +
-          libro.autore +
-          ". Contattami via WhatsApp. Conferma il prestito qui: " +
-          manageUrl;
-        whatsappUrl = "https://wa.me/" + numero + "?text=" + encodeURIComponent(testo);
+        whatsappUrl = "https://wa.me/" + numero + "?text=" + encodeURIComponent(testoBase);
       }
 
       setSuccessData({
@@ -151,46 +154,32 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20">
           <p className="font-semibold text-[#3B6D11] mb-1">Richiesta inviata!</p>
-          {/* Richiedente ha Telegram + owner ha Telegram → bottone diretto */}
-          {successData.richiedenteTab === "telegram" && successData.telegramUrl ? (
+          {(successData.telegramUrl || successData.whatsappUrl) ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
-                Apri Telegram per contattare il proprietario e confermare il prestito.
+                Avvisa il proprietario — riceverà il tuo contatto e potrà risponderti.
               </p>
-              <Button asChild className="w-full" size="lg">
-                <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
-                  Contatta su Telegram
-                </a>
-              </Button>
+              {successData.telegramUrl && (
+                <Button asChild className="w-full" size="lg">
+                  <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4" />
+                    Notifica su Telegram
+                  </a>
+                </Button>
+              )}
+              {successData.whatsappUrl && (
+                <Button asChild className="w-full" size="lg" variant={successData.telegramUrl ? "outline" : "default"}>
+                  <a href={successData.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4" />
+                    Notifica su WhatsApp
+                  </a>
+                </Button>
+              )}
             </div>
-          ) : successData.richiedenteTab === "whatsapp" && successData.whatsappUrl ? (
-            /* Richiedente ha WhatsApp + owner ha WhatsApp → bottone diretto */
-            <div className="space-y-3">
-              <p className="text-sm text-gray-700">
-                Apri WhatsApp per contattare il proprietario e confermare il prestito.
-              </p>
-              <Button asChild className="w-full" size="lg">
-                <a href={successData.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
-                  Contatta su WhatsApp
-                </a>
-              </Button>
-            </div>
-          ) : successData.richiedenteTab === "whatsapp" && successData.ownerHasTelegram ? (
-            /* Richiedente ha WhatsApp, owner ha Telegram → aspetta che il proprietario li contatti */
-            <p className="text-sm text-gray-700">
-              Il proprietario vedrà la richiesta e ti contatterà via WhatsApp al numero che hai fornito.
-            </p>
           ) : (
-            /* Fallback */
-            <div className="space-y-3">
-              <p className="text-sm text-gray-700">
-                Contatta il proprietario direttamente:{" "}
-                <strong>{libro.contatto_alternativo}</strong>
-              </p>
+            <div className="space-y-2">
               <p className="text-sm text-gray-600">
-                Comunicagli questo link per confermare il prestito:
+                Condividi questo link con il proprietario per confermare il prestito:
               </p>
               <div className="flex gap-2">
                 <input
