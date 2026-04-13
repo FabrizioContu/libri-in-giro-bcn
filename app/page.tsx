@@ -27,15 +27,24 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <HeroIntro />
-      <main className="flex-1">
+      <main id="catalogo" className="flex-1">
         <CatalogClient libri={libri} />
       </main>
       <footer className="border-t border-gray-100 bg-white py-6 mt-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-sm text-gray-400 space-y-1">
           <p>Libri in Giro BCN &mdash; Comunità italiana di Barcellona</p>
-          <p>
+          <p className="flex items-center justify-center gap-4">
             <a href="/privacy" className="hover:text-gray-600 underline underline-offset-2 transition-colors">
               Privacy
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="https://t.me/LibriInGiroBCN"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline underline-offset-2 transition-colors"
+            >
+              Telegram
             </a>
           </p>
         </div>
