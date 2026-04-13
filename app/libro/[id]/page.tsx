@@ -210,9 +210,14 @@ export default async function LibroPage({ params, searchParams }: Props) {
                     Contattare in privato
                   </a>
                 ) : (
-                  <span className="font-medium">
-                    {libro.contatto_alternativo}
-                  </span>
+                  <a
+                    href={"https://wa.me/" + (libro.contatto_alternativo ?? "").replace(/\D/g, "")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[#3B6D11] hover:underline"
+                  >
+                    Contattare in privato
+                  </a>
                 )}
               </div>
             )}
