@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import BadgeGenere from "@/components/BadgeGenere";
 import { BadgeStato } from "@/components/BadgeStato";
 import { LibroDetailClient } from "./LibroDetailClient";
+import { GestisciButton } from "@/components/GestisciButton";
 import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
@@ -206,9 +207,7 @@ export default async function LibroPage({ params, searchParams }: Props) {
                     rel="noopener noreferrer"
                     className="font-semibold text-[#3B6D11] hover:underline"
                   >
-                    {libro.telegram.startsWith("@")
-                      ? libro.telegram
-                      : "@" + libro.telegram}
+                    Contattare in privato
                   </a>
                 ) : (
                   <span className="font-medium">
@@ -220,6 +219,8 @@ export default async function LibroPage({ params, searchParams }: Props) {
 
             {/* CTA / Not available message */}
             <LibroDetailClient libro={libro} activeLoan={activeLoan} />
+
+            <GestisciButton libroId={libro.id} />
           </div>
         </div>
 

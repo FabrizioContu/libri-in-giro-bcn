@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { AggiungiLibroForm } from "./AggiungiLibroForm";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 
 export default function AggiungiPage() {
   return (
@@ -26,6 +26,24 @@ export default function AggiungiPage() {
         </div>
 
         <AggiungiLibroForm />
+
+        <div className="p-4 rounded-2xl bg-[#EAF3DE] border border-[#3B6D11]/20 flex items-start gap-3">
+          <Send className="w-4 h-4 text-[#3B6D11] shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-[#3B6D11]">Hai molti libri da aggiungere?</p>
+            <p className="text-sm text-gray-600">
+              Scrivimi su Telegram e ti carico il catalogo in una volta sola.
+            </p>
+            <a
+              href="https://t.me/FabrizioContu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-sm text-[#3B6D11] font-medium hover:underline underline-offset-2 transition-colors"
+            >
+              Contattami in privato →
+            </a>
+          </div>
+        </div>
       </main>
     </div>
   );
