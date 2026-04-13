@@ -8,7 +8,7 @@ import BadgeGenere from "@/components/BadgeGenere";
 import { BadgeStato } from "@/components/BadgeStato";
 import { LibroDetailClient } from "./LibroDetailClient";
 import { GestisciButton } from "@/components/GestisciButton";
-import { ArrowLeft, MapPin, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
   const { data, error } = await supabase
@@ -192,33 +192,6 @@ export default async function LibroPage({ params, searchParams }: Props) {
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {libro.note}
                 </p>
-              </div>
-            )}
-
-            {/* Owner contact */}
-            {(libro.telegram || libro.contatto_alternativo) && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MessageCircle className="w-4 h-4 text-[#3B6D11] shrink-0" />
-                <span>Proprietario: </span>
-                {libro.telegram ? (
-                  <a
-                    href={"https://t.me/" + libro.telegram.replace(/^@/, "")}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-[#3B6D11] hover:underline"
-                  >
-                    Contattare in privato
-                  </a>
-                ) : (
-                  <a
-                    href={"https://wa.me/" + (libro.contatto_alternativo ?? "").replace(/\D/g, "")}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-[#3B6D11] hover:underline"
-                  >
-                    Contattare in privato
-                  </a>
-                )}
               </div>
             )}
 
