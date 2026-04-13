@@ -18,6 +18,11 @@ export async function POST(req: NextRequest) {
     if (!text.startsWith("/start")) return NextResponse.json({ ok: true });
     if (!username) return NextResponse.json({ ok: true });
 
+    // Aggiorna telegram_chat_id su tutti i libri di questo proprietario
+    await supabase
+      .from("libri")
+      .update({ telegram_chat_id: chatId })
+      .ilike("telegram", username);
     // Aggiorna telegram_chat_id tramite RPC con SECURITY DEFINER (bypassa RLS)
     await supabase.rpc("set_telegram_chat_id", {
       p_username: username,
