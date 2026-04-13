@@ -172,59 +172,60 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
   if (successData) {
     return (
       <div className="space-y-4 animate-in fade-in duration-300">
-        <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20">
-          <p className="font-semibold text-[#3B6D11] mb-1">Richiesta inviata!</p>
-          {successData.notifySent ? (
+        {successData.notifySent ? (
+          <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20">
+            <p className="font-semibold text-[#3B6D11] mb-1">Richiesta inviata!</p>
             <p className="text-sm text-gray-700">
               Il proprietario ha ricevuto una notifica automatica su Telegram con il tuo contatto.
             </p>
-          ) : (successData.telegramUrl || successData.whatsappUrl) ? (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-700">
-                Avvisa il proprietario — il messaggio include già il tuo contatto, potrà risponderti direttamente.
-              </p>
-              {successData.telegramUrl && (
-                <>
-                  <Button asChild className="w-full" size="lg">
-                    <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-4 h-4" />
-                      Notifica su Telegram
-                    </a>
-                  </Button>
-                  {successData.richiedenteTab === "whatsapp" && (
-                    <p className="text-xs text-gray-400">
-                      Si aprirà Telegram con un messaggio pre-compilato. Il tuo numero WhatsApp è già incluso.
-                    </p>
-                  )}
-                </>
-              )}
-              {successData.whatsappUrl && (
-                <Button asChild className="w-full" size="lg" variant={successData.telegramUrl ? "outline" : "default"}>
-                  <a href={successData.whatsappUrl} target="_blank" rel="noopener noreferrer">
+          </div>
+        ) : (successData.telegramUrl || successData.whatsappUrl) ? (
+          <div className="space-y-3">
+            {successData.telegramUrl && (
+              <>
+                <Button asChild className="w-full" size="lg">
+                  <a href={successData.telegramUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="w-4 h-4" />
-                    Notifica su WhatsApp
+                    Contatta il proprietario su Telegram
                   </a>
                 </Button>
-              )}
+                {successData.richiedenteTab === "whatsapp" && (
+                  <p className="text-xs text-gray-400 text-center">
+                    Il messaggio include già il tuo numero WhatsApp.
+                  </p>
+                )}
+              </>
+            )}
+            {successData.whatsappUrl && (
+              <Button asChild className="w-full" size="lg" variant={successData.telegramUrl ? "outline" : "default"}>
+                <a href={successData.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="w-4 h-4" />
+                  Contatta il proprietario su WhatsApp
+                </a>
+              </Button>
+            )}
+            <p className="text-xs text-gray-400 text-center">
+              Il messaggio è già pre-compilato con il tuo contatto.
+            </p>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20 space-y-2">
+            <p className="font-semibold text-[#3B6D11]">Richiesta inviata!</p>
+            <p className="text-sm text-gray-600">
+              Condividi questo link con il proprietario per confermare il prestito:
+            </p>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={successData.manageUrl}
+                className="flex-1 text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 select-all"
+              />
+              <Button variant="outline" size="sm" onClick={handleCopy}>
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
             </div>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Condividi questo link con il proprietario per confermare il prestito:
-              </p>
-              <div className="flex gap-2">
-                <input
-                  readOnly
-                  value={successData.manageUrl}
-                  className="flex-1 text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 select-all"
-                />
-                <Button variant="outline" size="sm" onClick={handleCopy}>
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
