@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "Libri in Giro BCN",
   description:
     "Condividi e prendi in prestito libri con la comunità italiana di Barcellona.",
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },

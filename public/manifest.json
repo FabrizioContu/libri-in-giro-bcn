@@ -1,0 +1,23 @@
+{
+  "name": "Libri in Giro BCN",
+  "short_name": "Libri BCN",
+  "description": "Condividi e prendi in prestito libri con la comunità italiana di Barcellona.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EAF3DE",
+  "theme_color": "#3B6D11",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
