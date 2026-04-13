@@ -115,18 +115,18 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         notifySent = notifyData.ok === true;
       } catch { /* non bloccare il flusso */ }
 
-      // Messaggio base — include sempre il contatto del richiedente
+      // Messaggio in prima persona — il richiedente lo manda direttamente al proprietario
       const contattoLabel =
         tab === "telegram"
           ? "Telegram: " + contatto
           : "WhatsApp: +" + contatto;
 
-      const testoBase =
-        "Ciao! Qualcuno vuole prendere in prestito \"" +
+      const testoManuale =
+        "Ciao! Vorrei prendere in prestito \"" +
         libro.titolo +
         "\" di " +
         libro.autore +
-        ". Contattalo su " +
+        ". Puoi contattarmi su " +
         contattoLabel +
         ". Gestisci la richiesta qui: " +
         manageUrl;
@@ -137,11 +137,11 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
 
       if (libro.telegram) {
         const tgUsername = libro.telegram.replace(/^@/, "");
-        telegramUrl = "https://t.me/" + tgUsername + "?text=" + encodeURIComponent(testoBase);
+        telegramUrl = "https://t.me/" + tgUsername + "?text=" + encodeURIComponent(testoManuale);
       }
       if (libro.contatto_alternativo) {
         const numero = libro.contatto_alternativo.replace(/\D/g, "");
-        whatsappUrl = "https://wa.me/" + numero + "?text=" + encodeURIComponent(testoBase);
+        whatsappUrl = "https://wa.me/" + numero + "?text=" + encodeURIComponent(testoManuale);
       }
 
       setSuccessData({
