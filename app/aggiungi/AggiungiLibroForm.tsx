@@ -90,6 +90,15 @@ export function AggiungiLibroForm() {
 
       if (insertError) throw insertError;
 
+      // Salva il token localmente per recupero futuro dalla pagina del libro
+      try {
+        const stored = JSON.parse(localStorage.getItem("lgbcn_tokens") ?? "{}");
+        stored[data.id] = data.edit_token;
+        localStorage.setItem("lgbcn_tokens", JSON.stringify(stored));
+      } catch {
+        // localStorage non disponibile — non bloccare il flusso
+      }
+
       router.push("/libro/" + data.id + "?nuovo=true");
     } catch (err: unknown) {
       console.error(err);
@@ -172,6 +181,9 @@ export function AggiungiLibroForm() {
                 ))}
               </SelectContent>
             </Select>
+            <p className="text-xs text-gray-400">
+              Il tuo barrio abituale — serve per organizzare il ritiro.
+            </p>
           </div>
         </div>
       </div>
@@ -192,7 +204,7 @@ export function AggiungiLibroForm() {
         >
           <TabsList>
             <TabsTrigger value="telegram">Telegram</TabsTrigger>
-            <TabsTrigger value="altro">Altro</TabsTrigger>
+            <TabsTrigger value="altro">WhatsApp</TabsTrigger>
           </TabsList>
           <TabsContent value="telegram">
             <div className="relative mt-2">
@@ -212,15 +224,27 @@ export function AggiungiLibroForm() {
                 autoComplete="off"
               />
             </div>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Il tuo nome profilo non sarà visibile — solo il link al tuo Telegram.
+            </p>
           </TabsContent>
           <TabsContent value="altro">
-            <Input
-              placeholder="WhatsApp, email, o come preferisci essere contattato"
-              value={form.contattoAlt}
-              onChange={(e) => setForm((f) => ({ ...f, contattoAlt: e.target.value }))}
-              className="mt-2"
-              autoComplete="off"
-            />
+            <div className="relative mt-2">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium select-none">
+                +
+              </span>
+              <Input
+                placeholder="34 612 345 678"
+                value={form.contattoAlt}
+                onChange={(e) => setForm((f) => ({ ...f, contattoAlt: e.target.value }))}
+                className="pl-7"
+                autoComplete="tel"
+                inputMode="tel"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Includi il prefisso internazionale, es. 34 per la Spagna
+            </p>
           </TabsContent>
         </Tabs>
       </div>
@@ -248,7 +272,11 @@ export function AggiungiLibroForm() {
             onChange={(e) => setForm((f) => ({ ...f, copertina: e.target.value }))}
           />
           <p className="text-xs text-gray-400">
-            Incolla un link diretto all'immagine della copertina.
+            Cerca il libro su{" "}
+            <a href="https://openlibrary.org" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-gray-600">
+              openlibrary.org
+            </a>
+            {" "}o Google Immagini, poi clic destro sull&apos;immagine → Copia indirizzo immagine.
           </p>
         </div>
 

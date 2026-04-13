@@ -23,10 +23,9 @@ interface LoVoglioFormProps {
 }
 
 export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
-  const [tab, setTab] = useState<"telegram" | "whatsapp" | "altro">("telegram");
+  const [tab, setTab] = useState<"telegram" | "whatsapp">("telegram");
   const [telegramUsername, setTelegramUsername] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [altroContatto, setAltroContatto] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [nodoRitiro, setNodoRitiro] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,8 +34,10 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
     prestitoId: string;
     editToken: string;
     manageUrl: string;
+    richiedenteTab: "telegram" | "whatsapp";
     ownerHasTelegram: boolean;
     telegramUrl?: string;
+    whatsappUrl?: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -51,9 +52,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         ? telegramUsername.startsWith("@")
           ? telegramUsername
           : "@" + telegramUsername
-        : tab === "whatsapp"
-        ? whatsappNumber.replace(/\s+/g, "").replace(/^\+/, "")
-        : altroContatto;
+        : whatsappNumber.replace(/\s+/g, "").replace(/^\+/, "");
 
     if (
       !contatto.trim() ||
@@ -67,7 +66,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
     setLoading(true);
 
     try {
-      const proprietarioTipo = libro.telegram ? "telegram" : "altro";
+      const proprietarioTipo = libro.telegram ? "telegram" : "whatsapp";
       const proprietarioContatto = libro.telegram
         ? libro.telegram.startsWith("@")
           ? libro.telegram
@@ -97,6 +96,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
 
       const ownerHasTelegram = !!libro.telegram;
       let telegramUrl: string | undefined;
+      let whatsappUrl: string | undefined;
 
       if (ownerHasTelegram && libro.telegram) {
         const tgUsername = libro.telegram.replace(/^@/, "");
@@ -110,14 +110,26 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
           ". Conferma qui: " +
           manageUrl;
         telegramUrl = "https://t.me/" + tgUsername + "?text=" + encodeURIComponent(testo);
+      } else if (libro.contatto_alternativo) {
+        const numero = libro.contatto_alternativo.replace(/\D/g, "");
+        const testo =
+          "Ciao! Vorrei prendere in prestito \"" +
+          libro.titolo +
+          "\" di " +
+          libro.autore +
+          ". Contattami via WhatsApp. Conferma il prestito qui: " +
+          manageUrl;
+        whatsappUrl = "https://wa.me/" + numero + "?text=" + encodeURIComponent(testo);
       }
 
       setSuccessData({
         prestitoId,
         editToken,
         manageUrl,
+        richiedenteTab: tab,
         ownerHasTelegram,
         telegramUrl,
+        whatsappUrl,
       });
     } catch (err: unknown) {
       console.error(err);
@@ -139,7 +151,8 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       <div className="space-y-4 animate-in fade-in duration-300">
         <div className="p-4 rounded-xl bg-[#EAF3DE] border border-[#3B6D11]/20">
           <p className="font-semibold text-[#3B6D11] mb-1">Richiesta inviata!</p>
-          {successData.ownerHasTelegram ? (
+          {/* Richiedente ha Telegram + owner ha Telegram → bottone diretto */}
+          {successData.richiedenteTab === "telegram" && successData.telegramUrl ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
                 Apri Telegram per contattare il proprietario e confermare il prestito.
@@ -151,10 +164,29 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
                 </a>
               </Button>
             </div>
-          ) : (
+          ) : successData.richiedenteTab === "whatsapp" && successData.whatsappUrl ? (
+            /* Richiedente ha WhatsApp + owner ha WhatsApp → bottone diretto */
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
-                Il proprietario non ha Telegram. Contattalo direttamente:{" "}
+                Apri WhatsApp per contattare il proprietario e confermare il prestito.
+              </p>
+              <Button asChild className="w-full" size="lg">
+                <a href={successData.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="w-4 h-4" />
+                  Contatta su WhatsApp
+                </a>
+              </Button>
+            </div>
+          ) : successData.richiedenteTab === "whatsapp" && successData.ownerHasTelegram ? (
+            /* Richiedente ha WhatsApp, owner ha Telegram → aspetta che il proprietario li contatti */
+            <p className="text-sm text-gray-700">
+              Il proprietario vedrà la richiesta e ti contatterà via WhatsApp al numero che hai fornito.
+            </p>
+          ) : (
+            /* Fallback */
+            <div className="space-y-3">
+              <p className="text-sm text-gray-700">
+                Contatta il proprietario direttamente:{" "}
                 <strong>{libro.contatto_alternativo}</strong>
               </p>
               <p className="text-sm text-gray-600">
@@ -183,16 +215,13 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         <Label className="text-base font-semibold text-gray-900">
           Come possiamo contattarti?
         </Label>
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "telegram" | "whatsapp" | "altro")}>
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "telegram" | "whatsapp")}>
           <TabsList className="w-full">
             <TabsTrigger value="telegram" className="flex-1">
               Telegram
             </TabsTrigger>
             <TabsTrigger value="whatsapp" className="flex-1">
               WhatsApp
-            </TabsTrigger>
-            <TabsTrigger value="altro" className="flex-1">
-              Altro
             </TabsTrigger>
           </TabsList>
           <TabsContent value="telegram">
@@ -226,15 +255,6 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
             <p className="text-xs text-gray-400 mt-1.5">
               Includi il prefisso internazionale, es. 34 per la Spagna
             </p>
-          </TabsContent>
-          <TabsContent value="altro">
-            <Input
-              placeholder="Email, o come preferisci essere contattato"
-              value={altroContatto}
-              onChange={(e) => setAltroContatto(e.target.value)}
-              className="mt-2"
-              autoComplete="off"
-            />
           </TabsContent>
         </Tabs>
         <p className="text-xs text-gray-400 pt-1">

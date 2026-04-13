@@ -1,37 +1,36 @@
-import { Fragment } from "react";
-import { BookPlus, Search, Handshake } from "lucide-react";
-import { ElementType } from "react";
-
-const steps: { icon: ElementType; label: string; sub: string }[] = [
-  { icon: BookPlus, label: "Aggiungi", sub: "il tuo libro" },
-  { icon: Search, label: "Trova", sub: "un libro" },
-  { icon: Handshake, label: "Prendilo", sub: "in prestito" },
-];
+import { Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function HeroIntro() {
   return (
-    <section className="bg-white border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <p className="text-center text-gray-500 text-base sm:text-lg mb-8">
-          Scambia libri con la comunità italiana di Barcellona
+    <section className="bg-gradient-to-b from-[#EAF3DE] to-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 text-center">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+          Libri tra italiani<br className="hidden sm:block" /> a Barcellona
+        </h1>
+        <p className="text-base sm:text-lg text-gray-500 max-w-xl mx-auto mb-10">
+          Un gruppo dove condividiamo, prestiamo e scambiamo libri.
         </p>
-        <div className="flex flex-row items-center justify-center gap-4 ">
-          {steps.map(({ icon: Icon, label, sub }, i) => (
-            <Fragment key={label}>
-              <div className="flex flex-col items-center gap-2 px-6">
-                <div className="w-10 h-10 rounded-full bg-[#EAF3DE] flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-[#3B6D11]" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-gray-800">{label}</p>
-                  <p className="text-xs text-gray-400">{sub}</p>
-                </div>
-              </div>
-              {i < steps.length - 1 && (
-                <div className="hidden sm:block w-8 h-px bg-gray-200 shrink-0" />
-              )}
-            </Fragment>
-          ))}
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button asChild size="lg" className="w-full sm:w-auto gap-2">
+            <a
+              href="https://t.me/LibriInGiroBCN"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Send className="w-4 h-4" />
+              Unisciti al gruppo Telegram
+            </a>
+          </Button>
+        </div>
+
+        <div className="mt-8">
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <a href="#catalogo">
+              Trova il tuo prossimo libro ↓
+            </a>
+          </Button>
         </div>
       </div>
     </section>
