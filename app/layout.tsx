@@ -39,8 +39,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
-        {children}
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased flex flex-col">
+        <div className="flex-1">{children}</div>
+        <footer className="py-4 text-center text-xs text-gray-400">
+          Sviluppato da{" "}
+          <a
+            href="https://fabriziocontu.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-[#3B6D11] transition-colors"
+          >
+            FabriDev
+          </a>
+        </footer>
       </body>
     </html>
   );
