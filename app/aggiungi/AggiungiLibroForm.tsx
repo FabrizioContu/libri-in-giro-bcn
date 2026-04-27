@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { BookPlus, AlertTriangle } from "lucide-react";
+import { BookPlus, AlertTriangle, Scan, CheckCircle } from "lucide-react";
+import { ISBNScanner } from "@/components/ISBNScanner";
 
 export function AggiungiLibroForm() {
   const router = useRouter();
@@ -33,6 +34,58 @@ export function AggiungiLibroForm() {
   const [contactTab, setContactTab] = useState<"telegram" | "altro">("telegram");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [isbnLoading, setIsbnLoading] = useState(false);
+  const [isbnSource, setIsbnSource] = useState<string | null>(null);
+
+  const handleIsbnDetected = async (isbn: string) => {
+    setShowScanner(false);
+    setIsbnLoading(true);
+    setError(null);
+    try {
+      const olRes = await fetch(
+        `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
+      );
+      const olData = await olRes.json();
+      const olBook = olData[`ISBN:${isbn}`];
+      if (olBook) {
+        setForm((f) => ({
+          ...f,
+          titolo: olBook.title || f.titolo,
+          autore: olBook.authors?.[0]?.name || f.autore,
+          copertina:
+            olBook.cover?.large ||
+            olBook.cover?.medium ||
+            olBook.cover?.small ||
+            f.copertina,
+        }));
+        setIsbnSource(isbn);
+        return;
+      }
+      const gbRes = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`
+      );
+      const gbData = await gbRes.json();
+      const gbBook = gbData.items?.[0]?.volumeInfo;
+      if (gbBook) {
+        setForm((f) => ({
+          ...f,
+          titolo: gbBook.title || f.titolo,
+          autore: gbBook.authors?.[0] || f.autore,
+          copertina:
+            gbBook.imageLinks?.thumbnail?.replace("http:", "https:") ||
+            f.copertina,
+        }));
+        setIsbnSource(isbn);
+        return;
+      }
+      setError("ISBN non trovato nelle banche dati. Inserisci i dettagli manualmente.");
+    } catch {
+      setError("Errore durante la ricerca del libro. Riprova.");
+    } finally {
+      setIsbnLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +163,38 @@ export function AggiungiLibroForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">
-        <h2 className="font-semibold text-gray-900">Dettagli del libro</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-gray-900">Dettagli del libro</h2>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowScanner(true)}
+            disabled={isbnLoading}
+            className="gap-1.5"
+          >
+            {isbnLoading ? (
+              <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+            ) : (
+              <Scan className="w-3.5 h-3.5" />
+            )}
+            {isbnLoading ? "Ricerca..." : "Scansiona ISBN"}
+          </Button>
+        </div>
+
+        {showScanner && (
+          <ISBNScanner
+            onDetected={handleIsbnDetected}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
+
+        {isbnSource && !isbnLoading && (
+          <div className="flex items-center gap-1.5 text-xs text-[#3B6D11]">
+            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+            Dati importati dall&apos;ISBN {isbnSource} — verifica e completa i campi
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -311,7 +395,7 @@ export function AggiungiLibroForm() {
         </div>
       )}
 
-      <Button type="submit" size="lg" disabled={loading} className="w-full sm:w-auto">
+      <Button type="submit" size="lg" disabled={loading || isbnLoading} className="w-full sm:w-auto">
         {loading ? (
           <span className="flex items-center gap-2">
             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
