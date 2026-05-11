@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Libro, GENERE_STYLE } from "@/lib/types";
 import BadgeGenere from "./BadgeGenere";
+import { AvatarNickname } from "./AvatarNickname";
 import { MapPin } from "lucide-react";
 
 interface LibroCardProps {
@@ -66,6 +67,7 @@ export function LibroCard({ libro }: LibroCardProps) {
               </span>
             )}
           </div>
+          <AvatarNickname emoji={libro.avatar_emoji} nickname={libro.nickname} />
         </div>
       </article>
     </Link>

@@ -8,6 +8,7 @@ import BadgeGenere from "@/components/BadgeGenere";
 import { BadgeStato } from "@/components/BadgeStato";
 import { LibroDetailClient } from "./LibroDetailClient";
 import { GestisciButton } from "@/components/GestisciButton";
+import { AvatarNickname } from "@/components/AvatarNickname";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
@@ -186,6 +187,13 @@ export default async function LibroPage({ params, searchParams }: Props) {
                 </span>
               )}
             </div>
+
+            {(libro.nickname || libro.avatar_emoji) && (
+              <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>Condiviso da</span>
+                <AvatarNickname emoji={libro.avatar_emoji} nickname={libro.nickname} />
+              </div>
+            )}
 
             {libro.note && (
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">

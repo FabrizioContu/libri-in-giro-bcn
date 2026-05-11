@@ -39,6 +39,8 @@ export interface Libro {
   note: string | null;
   edit_token: string;
   created_at: string;
+  nickname: string | null;
+  avatar_emoji: string | null;
 }
 
 export interface Prestito {

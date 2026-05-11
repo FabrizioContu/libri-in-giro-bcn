@@ -36,7 +36,7 @@ export function HeroIntro() {
 
           <div className="flex-shrink-0 w-full max-w-xs lg:max-w-sm xl:max-w-md">
             <Image
-              src="/hero.webp"
+              src="/hero1.webp"
               alt="Barcellona — Libri in Giro BCN"
               width={400}
               height={600}
