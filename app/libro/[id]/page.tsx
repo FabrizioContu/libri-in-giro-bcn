@@ -9,6 +9,7 @@ import { BadgeStato } from "@/components/BadgeStato";
 import { LibroDetailClient } from "./LibroDetailClient";
 import { GestisciButton } from "@/components/GestisciButton";
 import { AvatarNickname } from "@/components/AvatarNickname";
+import { CopyTokenButton } from "@/components/CopyTokenButton";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
@@ -129,6 +130,19 @@ export default async function LibroPage({ params, searchParams }: Props) {
               >
                 Condividi su WhatsApp
               </a>
+            </div>
+            <div className="pt-2 border-t border-[#3B6D11]/15">
+              <p className="text-xs text-[#3B6D11]/80 mb-1.5 font-medium">
+                Salva questo link — ti serve per gestire il libro da altri dispositivi:
+              </p>
+              <div className="flex gap-2 items-center">
+                <input
+                  readOnly
+                  value={siteUrl + "/libro/" + libro.id + "/gestisci?token=" + libro.edit_token}
+                  className="flex-1 text-xs bg-white/60 border border-[#3B6D11]/20 rounded-lg px-2 py-1.5 text-gray-600 select-all"
+                />
+                <CopyTokenButton token={libro.edit_token} libroId={libro.id} siteUrl={siteUrl} />
+              </div>
             </div>
           </div>
         )}
