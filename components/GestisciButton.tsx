@@ -78,7 +78,7 @@ export function GestisciButton({ libroId }: Props) {
             </Button>
           </div>
           <p className="text-xs text-gray-400">
-            Il codice ti è stato mostrato al momento dell&apos;inserimento.
+            Trovi il codice nel link di gestione mostrato quando hai aggiunto il libro.
           </p>
         </div>
       )}
