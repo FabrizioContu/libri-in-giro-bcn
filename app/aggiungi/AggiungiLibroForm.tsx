@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GENERI, BARRIOS } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,8 @@ import Link from "next/link";
 import { BookPlus, AlertTriangle, Scan, CheckCircle } from "lucide-react";
 import { ISBNScanner } from "@/components/ISBNScanner";
 
+const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
+
 export function AggiungiLibroForm() {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -30,8 +32,20 @@ export function AggiungiLibroForm() {
     contattoAlt: "",
     copertina: "",
     note: "",
+    nickname: "",
+    avatar_emoji: "",
   });
   const [contactTab, setContactTab] = useState<"telegram" | "altro">("telegram");
+
+  useEffect(() => {
+    try {
+      const savedNickname = localStorage.getItem("lgbcn_nickname") ?? "";
+      const savedEmoji = localStorage.getItem("lgbcn_avatar_emoji") ?? "";
+      if (savedNickname || savedEmoji) {
+        setForm((f) => ({ ...f, nickname: savedNickname, avatar_emoji: savedEmoji }));
+      }
+    } catch { /* localStorage non disponibile */ }
+  }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(false);
@@ -137,17 +151,20 @@ export function AggiungiLibroForm() {
           disponibile: true,
           copertina_url: form.copertina.trim() || null,
           note: form.note.trim() || null,
+          nickname: form.nickname.trim() || null,
+          avatar_emoji: form.avatar_emoji || null,
         })
         .select()
         .single();
 
       if (insertError) throw insertError;
 
-      // Salva il token localmente per recupero futuro dalla pagina del libro
       try {
         const stored = JSON.parse(localStorage.getItem("lgbcn_tokens") ?? "{}");
         stored[data.id] = data.edit_token;
         localStorage.setItem("lgbcn_tokens", JSON.stringify(stored));
+        if (form.nickname.trim()) localStorage.setItem("lgbcn_nickname", form.nickname.trim());
+        if (form.avatar_emoji) localStorage.setItem("lgbcn_avatar_emoji", form.avatar_emoji);
       } catch {
         // localStorage non disponibile — non bloccare il flusso
       }
@@ -353,6 +370,47 @@ export function AggiungiLibroForm() {
           Privacy
         </Link>
       </p>
+
+      {/* Avatar */}
+      <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">
+        <div>
+          <h2 className="font-semibold text-gray-900">Il tuo avatar <span className="font-normal text-gray-400 text-sm">(opzionale)</span></h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Scegli un soprannome e un&apos;emoji — apparirà accanto ai tuoi libri al posto del tuo contatto.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Emoji</Label>
+          <div className="flex flex-wrap gap-2">
+            {AVATAR_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, avatar_emoji: f.avatar_emoji === emoji ? "" : emoji }))}
+                className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
+                  form.avatar_emoji === emoji
+                    ? "border-[#3B6D11] bg-[#EAF3DE] shadow-sm"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="nickname">Soprannome</Label>
+          <Input
+            id="nickname"
+            placeholder="Es. La lettrice di Gràcia"
+            value={form.nickname}
+            onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
+            maxLength={40}
+          />
+        </div>
+      </div>
 
       {/* Optional fields */}
       <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">

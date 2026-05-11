@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { Save, Trash2, ToggleLeft, ToggleRight, AlertTriangle } from "lucide-react";
 
+const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
+
 interface GestisciLibroClientProps {
   libro: Libro;
   editToken: string;
@@ -34,6 +36,8 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
     copertina: libro.copertina_url ?? "",
     note: libro.note ?? "",
     disponibile: libro.disponibile,
+    nickname: libro.nickname ?? "",
+    avatar_emoji: libro.avatar_emoji ?? "",
   });
   const [contactTab, setContactTab] = useState<"telegram" | "altro">(
     libro.telegram ? "telegram" : "altro"
@@ -62,6 +66,8 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
       p_copertina_url: form.copertina || null,
       p_note: form.note || null,
       p_disponibile: form.disponibile,
+      p_nickname: form.nickname.trim() || null,
+      p_avatar_emoji: form.avatar_emoji || null,
     });
 
     setLoading(false);
@@ -91,6 +97,8 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
       p_copertina_url: form.copertina || null,
       p_note: form.note || null,
       p_disponibile: newVal,
+      p_nickname: form.nickname.trim() || null,
+      p_avatar_emoji: form.avatar_emoji || null,
     });
 
     if (!result.success && result.error) {
@@ -267,6 +275,47 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
             placeholder="Condizioni del libro, edizione, note per il lettore..."
             value={form.note}
             onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
+          />
+        </div>
+      </div>
+
+      {/* Avatar */}
+      <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">
+        <div>
+          <h3 className="font-semibold text-gray-900">Il tuo avatar <span className="font-normal text-gray-400 text-sm">(opzionale)</span></h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Appare accanto ai tuoi libri al posto del tuo contatto.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Emoji</Label>
+          <div className="flex flex-wrap gap-2">
+            {AVATAR_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, avatar_emoji: f.avatar_emoji === emoji ? "" : emoji }))}
+                className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
+                  form.avatar_emoji === emoji
+                    ? "border-[#3B6D11] bg-[#EAF3DE] shadow-sm"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="nickname">Soprannome</Label>
+          <Input
+            id="nickname"
+            placeholder="Es. La lettrice di Gràcia"
+            value={form.nickname}
+            onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
+            maxLength={40}
           />
         </div>
       </div>

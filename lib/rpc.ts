@@ -26,6 +26,8 @@ export async function aggiornaLibro(params: {
   p_copertina_url: string | null;
   p_note: string | null;
   p_disponibile: boolean;
+  p_nickname?: string | null;
+  p_avatar_emoji?: string | null;
 }): Promise<{ success: boolean; error?: RpcError }> {
   const { error } = await supabase.rpc("aggiorna_libro", params);
   if (error) return { success: false, error: parseRpcError(error) };
