@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { BookPlus, AlertTriangle, Scan, CheckCircle } from "lucide-react";
 import { ISBNScanner } from "@/components/ISBNScanner";
+import { fetchCoverByTitleAuthor } from "@/lib/cover-search";
 
 const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
 
@@ -112,31 +113,11 @@ export function AggiungiLibroForm() {
     const tid = setTimeout(async () => {
       if (copertinaCurrent.current) return;
       setCoverSearchLoading(true);
-      try {
-        const olRes = await fetch(
-          `https://openlibrary.org/search.json?title=${encodeURIComponent(form.titolo)}&author=${encodeURIComponent(form.autore)}&limit=1&fields=cover_i`
-        );
-        const olData = await olRes.json();
-        const coverId = olData.docs?.[0]?.cover_i;
-        if (coverId) {
-          const url = `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
-          setForm((f) => ({ ...f, copertina: f.copertina || url }));
-          setCoverAutoFound(true);
-          return;
-        }
-        const gbRes = await fetch(
-          `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(form.titolo)}+inauthor:${encodeURIComponent(form.autore)}&maxResults=1`
-        );
-        const gbData = await gbRes.json();
-        const thumbnail = gbData.items?.[0]?.volumeInfo?.imageLinks?.thumbnail?.replace("http:", "https:");
-        if (thumbnail) {
-          setForm((f) => ({ ...f, copertina: f.copertina || thumbnail }));
-          setCoverAutoFound(true);
-        }
-      } catch {
-        // silent — cover is optional
-      } finally {
-        setCoverSearchLoading(false);
+      const url = await fetchCoverByTitleAuthor(form.titolo, form.autore);
+      setCoverSearchLoading(false);
+      if (url) {
+        setForm((f) => ({ ...f, copertina: f.copertina || url }));
+        setCoverAutoFound(true);
       }
     }, 1000);
 
@@ -221,7 +202,7 @@ export function AggiungiLibroForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-gray-900">Dettagli del libro</h2>
