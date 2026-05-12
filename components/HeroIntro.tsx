@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroIntro() {
   return (
-    <section className="bg-gradient-to-b from-[#EAF3DE] to-white">
+    <section className="bg-linear-to-b from-[#EAF3DE] to-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
         <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
           <div className="flex-1 text-center lg:text-left">
@@ -34,7 +34,7 @@ export function HeroIntro() {
             </div>
           </div>
 
-          <div className="flex-shrink-0 w-full max-w-xs lg:max-w-sm xl:max-w-md">
+          <div className="shrink-0 w-full max-w-xs lg:max-w-sm xl:max-w-md">
             <Image
               src="/hero1.webp"
               alt="Barcellona — Libri in Giro BCN"
