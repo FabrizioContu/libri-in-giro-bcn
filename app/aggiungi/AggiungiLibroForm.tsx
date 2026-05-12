@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { GENERI, BARRIOS } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
@@ -51,6 +51,10 @@ export function AggiungiLibroForm() {
   const [showScanner, setShowScanner] = useState(false);
   const [isbnLoading, setIsbnLoading] = useState(false);
   const [isbnSource, setIsbnSource] = useState<string | null>(null);
+  const [coverSearchLoading, setCoverSearchLoading] = useState(false);
+  const [coverAutoFound, setCoverAutoFound] = useState(false);
+  const copertinaCurrent = useRef(form.copertina);
+  copertinaCurrent.current = form.copertina;
 
   const handleIsbnDetected = async (isbn: string) => {
     setShowScanner(false);
@@ -100,6 +104,45 @@ export function AggiungiLibroForm() {
       setIsbnLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isbnSource) return;
+    if (form.titolo.trim().length < 3 || form.autore.trim().length < 2) return;
+
+    const tid = setTimeout(async () => {
+      if (copertinaCurrent.current) return;
+      setCoverSearchLoading(true);
+      try {
+        const olRes = await fetch(
+          `https://openlibrary.org/search.json?title=${encodeURIComponent(form.titolo)}&author=${encodeURIComponent(form.autore)}&limit=1&fields=cover_i`
+        );
+        const olData = await olRes.json();
+        const coverId = olData.docs?.[0]?.cover_i;
+        if (coverId) {
+          const url = `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
+          setForm((f) => ({ ...f, copertina: f.copertina || url }));
+          setCoverAutoFound(true);
+          return;
+        }
+        const gbRes = await fetch(
+          `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(form.titolo)}+inauthor:${encodeURIComponent(form.autore)}&maxResults=1`
+        );
+        const gbData = await gbRes.json();
+        const thumbnail = gbData.items?.[0]?.volumeInfo?.imageLinks?.thumbnail?.replace("http:", "https:");
+        if (thumbnail) {
+          setForm((f) => ({ ...f, copertina: f.copertina || thumbnail }));
+          setCoverAutoFound(true);
+        }
+      } catch {
+        // silent — cover is optional
+      } finally {
+        setCoverSearchLoading(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(tid);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.titolo, form.autore, isbnSource]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,6 +282,28 @@ export function AggiungiLibroForm() {
             />
           </div>
         </div>
+
+        {(coverSearchLoading || form.copertina) && (
+          <div className="flex items-center gap-3 pt-1">
+            <div className="shrink-0 w-11 h-14 rounded border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
+              {coverSearchLoading ? (
+                <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.copertina} alt="Copertina" className="w-full h-full object-cover" />
+              )}
+            </div>
+            <p className="text-xs text-gray-400">
+              {coverSearchLoading
+                ? "Cercando copertina..."
+                : coverAutoFound
+                ? <span className="text-[#3B6D11] flex items-center gap-1"><CheckCircle className="w-3 h-3 shrink-0" /> Copertina trovata automaticamente</span>
+                : isbnSource
+                ? <span className="text-[#3B6D11] flex items-center gap-1"><CheckCircle className="w-3 h-3 shrink-0" /> Copertina dall&apos;ISBN</span>
+                : "Copertina impostata"}
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -426,11 +491,7 @@ export function AggiungiLibroForm() {
             onChange={(e) => setForm((f) => ({ ...f, copertina: e.target.value }))}
           />
           <p className="text-xs text-gray-400">
-            Cerca il libro su{" "}
-            <a href="https://openlibrary.org" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-gray-600">
-              openlibrary.org
-            </a>
-            {" "}o Google Immagini, poi clic destro sull&apos;immagine → Copia indirizzo immagine.
+            Trovata automaticamente dal titolo. Puoi incollarla manualmente se vuoi cambiare.
           </p>
         </div>
 

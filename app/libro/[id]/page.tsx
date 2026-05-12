@@ -151,7 +151,7 @@ export default async function LibroPage({ params, searchParams }: Props) {
           {/* Cover */}
           <div className="shrink-0 mx-auto sm:mx-0">
             {libro.copertina_url ? (
-              <div className="relative w-200px h-300px sm:w-220px sm:h-330px rounded-2xl overflow-hidden shadow-md">
+              <div className="relative w-[200px] h-[300px] sm:w-[220px] sm:h-[330px] rounded-2xl overflow-hidden shadow-md">
                 <Image
                   src={libro.copertina_url}
                   alt={"Copertina di " + libro.titolo}
@@ -162,7 +162,7 @@ export default async function LibroPage({ params, searchParams }: Props) {
                 />
               </div>
             ) : (
-              <div className="w-200px h-300px sm:w-220px sm:h-330px rounded-2xl bg-[#EAF3DE] flex items-center justify-center shadow-md">
+              <div className="w-[200px] h-[300px] sm:w-[220px] sm:h-[330px] rounded-2xl bg-[#EAF3DE] flex items-center justify-center shadow-md">
                 <span className="text-7xl font-bold text-[#3B6D11] select-none">
                   {libro.autore.trim().split(' ').pop()?.[0].toUpperCase()}
                 </span>
