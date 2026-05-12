@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
 
 export function Header() {
   return (
@@ -10,7 +10,13 @@ export function Header() {
           href="/"
           className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-[#3B6D11] transition-colors flex-shrink-0"
         >
-          <BookOpen className="w-6 h-6 text-[#3B6D11]" aria-hidden="true" />
+          <Image
+            src="/logo.webp"
+            alt="Libri in Giro BCN"
+            width={32}
+            height={32}
+            className="rounded-sm"
+          />
           <span>
             Libri in Giro{" "}
             <span className="text-[#3B6D11]">BCN</span>
