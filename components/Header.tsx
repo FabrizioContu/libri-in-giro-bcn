@@ -15,7 +15,7 @@ export function Header() {
             alt="Libri in Giro BCN"
             width={32}
             height={32}
-            className="rounded-sm"
+            className="rounded-sm w-8 h-8"
           />
           <span>
             Libri in Giro{" "}
