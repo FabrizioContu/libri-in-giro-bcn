@@ -10,6 +10,22 @@ export default defineConfig({
     globals: true,
     include: ["__tests__/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["node_modules", ".next", "e2e"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      include: ["lib/**/*.ts", "components/**/*.tsx", "app/**/*.tsx"],
+      exclude: [
+        "lib/supabase.ts",
+        "components/ui/**",
+        "app/api/**",
+        "**/*.d.ts",
+      ],
+      thresholds: {
+        lines: 4,
+        functions: 2,
+        branches: 2,
+      },
+    },
   },
   resolve: {
     alias: {
