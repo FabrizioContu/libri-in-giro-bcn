@@ -13,7 +13,7 @@ export interface CreatePrestitoInput {
   proprietario_tipo: "telegram" | "whatsapp";
   messaggio_richiedente: string | null;
   nodo_ritiro: string | null;
-  turnstileToken: string;
+  captchaToken: string;
   honeypot: string;
 }
 
@@ -30,7 +30,7 @@ export async function createPrestito(
   const ip =
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  const captchaOk = await verifyHcaptcha(input.turnstileToken);
+  const captchaOk = await verifyHcaptcha(input.captchaToken);
   if (!captchaOk)
     return { success: false, error: "Verifica di sicurezza fallita. Riprova." };
 

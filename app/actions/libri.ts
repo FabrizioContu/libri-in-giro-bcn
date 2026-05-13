@@ -16,7 +16,7 @@ export interface CreateLibroInput {
   note: string | null;
   nickname: string | null;
   avatar_emoji: string | null;
-  turnstileToken: string;
+  captchaToken: string;
   honeypot: string;
 }
 
@@ -31,7 +31,7 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
   const ip =
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  const captchaOk = await verifyHcaptcha(input.turnstileToken);
+  const captchaOk = await verifyHcaptcha(input.captchaToken);
   if (!captchaOk)
     return { success: false, error: "Verifica di sicurezza fallita. Riprova." };
 

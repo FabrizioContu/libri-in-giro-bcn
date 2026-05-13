@@ -182,7 +182,7 @@ export function AggiungiLibroForm() {
       note: form.note.trim() || null,
       nickname: form.nickname.trim() || null,
       avatar_emoji: form.avatar_emoji || null,
-      turnstileToken,
+      captchaToken: turnstileToken,
       honeypot,
     });
 
