@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Libro, NODI_RITIRO } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { createPrestito } from "@/app/actions/prestiti";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,9 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [nodoRitiro, setNodoRitiro] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -64,6 +68,11 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       return;
     }
 
+    if (!turnstileToken) {
+      setError("Attendere il completamento della verifica di sicurezza.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -74,25 +83,28 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
           : "@" + libro.telegram
         : libro.contatto_alternativo ?? "";
 
-      const { data, error: insertError } = await supabase
-        .from("prestiti")
-        .insert({
-          libro_id: libro.id,
-          richiedente_contatto: contatto.trim(),
-          richiedente_tipo: tab,
-          proprietario_contatto: proprietarioContatto,
-          proprietario_tipo: proprietarioTipo,
-          stato: "richiesto",
-          messaggio_richiedente: messaggio.trim() || null,
-          nodo_ritiro: nodoRitiro || null,
-        })
-        .select()
-        .single();
+      const result = await createPrestito({
+        libro_id: libro.id,
+        richiedente_contatto: contatto.trim(),
+        richiedente_tipo: tab,
+        proprietario_contatto: proprietarioContatto,
+        proprietario_tipo: proprietarioTipo,
+        messaggio_richiedente: messaggio.trim() || null,
+        nodo_ritiro: nodoRitiro || null,
+        turnstileToken,
+        honeypot,
+      });
 
-      if (insertError) throw insertError;
+      if (!result.success) {
+        setError(result.error);
+        setTurnstileToken(null);
+        setTurnstileKey((k) => k + 1);
+        setLoading(false);
+        return;
+      }
 
-      const prestitoId = data.id;
-      const editToken = data.edit_token;
+      const prestitoId = result.id;
+      const editToken = result.edit_token;
       const manageUrl = siteUrl + "/prestito/" + prestitoId + "/gestisci?token=" + editToken;
 
       const ownerHasTelegram = !!libro.telegram;
@@ -312,6 +324,24 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
           rows={3}
         />
       </div>
+
+      {/* Honeypot — hidden from humans, filled by bots */}
+      <input
+        type="text"
+        name="website"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ display: "none" }}
+        autoComplete="off"
+      />
+
+      <TurnstileWidget
+        key={turnstileKey}
+        onToken={setTurnstileToken}
+        onExpire={() => setTurnstileToken(null)}
+      />
 
       {error && (
         <p className="text-sm text-[#A32D2D] bg-red-50 border border-red-100 rounded-xl px-3 py-2">
