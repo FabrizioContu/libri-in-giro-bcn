@@ -91,7 +91,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         proprietario_tipo: proprietarioTipo,
         messaggio_richiedente: messaggio.trim() || null,
         nodo_ritiro: nodoRitiro || null,
-        turnstileToken,
+        captchaToken: turnstileToken,
         honeypot,
       });
 
