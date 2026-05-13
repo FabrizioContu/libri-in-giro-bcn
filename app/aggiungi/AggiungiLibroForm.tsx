@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { GENERI, BARRIOS } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { createLibro } from "@/app/actions/libri";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +48,9 @@ export function AggiungiLibroForm() {
       }
     } catch { /* localStorage non disponibile */ }
   }, []);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(false);
@@ -153,52 +157,54 @@ export function AggiungiLibroForm() {
       return;
     }
 
+    if (!turnstileToken) {
+      setError("Attendere il completamento della verifica di sicurezza.");
+      return;
+    }
+
     setLoading(true);
 
-    try {
-      const telegramVal =
-        contactTab === "telegram"
-          ? form.telegram.trim().replace(/^@/, "") || null
-          : null;
-      const contattoAltVal =
-        contactTab === "altro" ? form.contattoAlt.trim() || null : null;
+    const telegramVal =
+      contactTab === "telegram"
+        ? form.telegram.trim().replace(/^@/, "") || null
+        : null;
+    const contattoAltVal =
+      contactTab === "altro" ? form.contattoAlt.trim() || null : null;
 
-      const { data, error: insertError } = await supabase
-        .from("libri")
-        .insert({
-          titolo: form.titolo.trim(),
-          autore: form.autore.trim(),
-          genere: form.genere || null,
-          barrio: form.barrio || null,
-          telegram: telegramVal,
-          contatto_alternativo: contattoAltVal,
-          disponibile: true,
-          copertina_url: form.copertina.trim() || null,
-          note: form.note.trim() || null,
-          nickname: form.nickname.trim() || null,
-          avatar_emoji: form.avatar_emoji || null,
-        })
-        .select()
-        .single();
+    const result = await createLibro({
+      titolo: form.titolo.trim(),
+      autore: form.autore.trim(),
+      genere: form.genere,
+      barrio: form.barrio,
+      telegram: telegramVal,
+      contatto_alternativo: contattoAltVal,
+      copertina_url: form.copertina.trim() || null,
+      note: form.note.trim() || null,
+      nickname: form.nickname.trim() || null,
+      avatar_emoji: form.avatar_emoji || null,
+      turnstileToken,
+      honeypot,
+    });
 
-      if (insertError) throw insertError;
-
-      try {
-        const stored = JSON.parse(localStorage.getItem("lgbcn_tokens") ?? "{}");
-        stored[data.id] = data.edit_token;
-        localStorage.setItem("lgbcn_tokens", JSON.stringify(stored));
-        if (form.nickname.trim()) localStorage.setItem("lgbcn_nickname", form.nickname.trim());
-        if (form.avatar_emoji) localStorage.setItem("lgbcn_avatar_emoji", form.avatar_emoji);
-      } catch {
-        // localStorage non disponibile — non bloccare il flusso
-      }
-
-      router.push("/libro/" + data.id + "?nuovo=true");
-    } catch (err: unknown) {
-      console.error(err);
-      setError("Si è verificato un errore durante l'inserimento. Riprova.");
+    if (!result.success) {
+      setError(result.error);
+      setTurnstileToken(null);
+      setTurnstileKey((k) => k + 1);
       setLoading(false);
+      return;
     }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem("lgbcn_tokens") ?? "{}");
+      stored[result.id] = result.edit_token;
+      localStorage.setItem("lgbcn_tokens", JSON.stringify(stored));
+      if (form.nickname.trim()) localStorage.setItem("lgbcn_nickname", form.nickname.trim());
+      if (form.avatar_emoji) localStorage.setItem("lgbcn_avatar_emoji", form.avatar_emoji);
+    } catch {
+      // localStorage non disponibile — non bloccare il flusso
+    }
+
+    router.push("/libro/" + result.id + "?nuovo=true");
   };
 
   return (
@@ -487,6 +493,24 @@ export function AggiungiLibroForm() {
           />
         </div>
       </div>
+
+      {/* Honeypot — hidden from humans, filled by bots */}
+      <input
+        type="text"
+        name="website"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ display: "none" }}
+        autoComplete="off"
+      />
+
+      <TurnstileWidget
+        key={turnstileKey}
+        onToken={setTurnstileToken}
+        onExpire={() => setTurnstileToken(null)}
+      />
 
       {error && (
         <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100">

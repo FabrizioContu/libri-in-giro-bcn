@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
+  // Verify Telegram webhook secret to reject unauthorized requests
+  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (secret) {
+    const incomingSecret = req.headers.get("x-telegram-bot-api-secret-token");
+    if (incomingSecret !== secret) {
+      return NextResponse.json({ ok: false }, { status: 401 });
+    }
+  }
+
   try {
     const body = await req.json();
     const message = body?.message;
