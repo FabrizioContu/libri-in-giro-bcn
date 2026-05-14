@@ -15,17 +15,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Search, CheckCircle } from "lucide-react";
+import {
+  Save,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+  AlertTriangle,
+  Search,
+  CheckCircle,
+} from "lucide-react";
 import { fetchCoverByTitleAuthor } from "@/lib/cover-search";
 
-const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
+const AVATAR_EMOJIS = [
+  "📚",
+  "🦊",
+  "🌙",
+  "🌿",
+  "🌻",
+  "🍀",
+  "🎭",
+  "🎨",
+  "🦋",
+  "🌊",
+  "⭐",
+  "🎵",
+  "🦉",
+  "🐙",
+  "🌺",
+  "🍄",
+];
 
 interface GestisciLibroClientProps {
   libro: Libro;
   editToken: string;
 }
 
-export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientProps) {
+export function GestisciLibroClient({
+  libro,
+  editToken,
+}: GestisciLibroClientProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     titolo: libro.titolo,
@@ -41,7 +69,7 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
     avatar_emoji: libro.avatar_emoji ?? "",
   });
   const [contactTab, setContactTab] = useState<"telegram" | "altro">(
-    libro.telegram ? "telegram" : "altro"
+    libro.telegram ? "telegram" : "altro",
   );
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -175,7 +203,9 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
             <Input
               id="titolo"
               value={form.titolo}
-              onChange={(e) => setForm((f) => ({ ...f, titolo: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, titolo: e.target.value }))
+              }
               required
             />
           </div>
@@ -184,7 +214,9 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
             <Input
               id="autore"
               value={form.autore}
-              onChange={(e) => setForm((f) => ({ ...f, autore: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, autore: e.target.value }))
+              }
               required
             />
           </div>
@@ -249,7 +281,10 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
                   placeholder="username"
                   value={form.telegram.replace(/^@/, "")}
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, telegram: e.target.value.replace(/^@/, "") }))
+                    setForm((f) => ({
+                      ...f,
+                      telegram: e.target.value.replace(/^@/, ""),
+                    }))
                   }
                   className="pl-7"
                 />
@@ -259,7 +294,9 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
               <Input
                 placeholder="WhatsApp, email, o altro contatto"
                 value={form.contattoAlt}
-                onChange={(e) => setForm((f) => ({ ...f, contattoAlt: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, contattoAlt: e.target.value }))
+                }
                 className="mt-2"
               />
             </TabsContent>
@@ -274,7 +311,9 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
               type="url"
               placeholder="https://..."
               value={form.copertina}
-              onChange={(e) => setForm((f) => ({ ...f, copertina: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, copertina: e.target.value }))
+              }
             />
             <button
               type="button"
@@ -297,7 +336,11 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
                   <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.copertina} alt="Copertina" className="w-full h-full object-cover" />
+                  <img
+                    src={form.copertina}
+                    alt="Copertina"
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
               <p className="text-xs text-gray-400">
@@ -305,7 +348,8 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
                   "Cercando copertina..."
                 ) : (
                   <span className="flex items-center gap-1 text-[#3B6D11]">
-                    <CheckCircle className="w-3 h-3 shrink-0" /> Copertina impostata
+                    <CheckCircle className="w-3 h-3 shrink-0" /> Copertina
+                    impostata
                   </span>
                 )}
               </p>
@@ -327,7 +371,12 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
       {/* Avatar */}
       <div className="p-5 rounded-2xl bg-white border border-gray-100 shadow-sm space-y-4">
         <div>
-          <h3 className="font-semibold text-gray-900">Il tuo avatar <span className="font-normal text-gray-400 text-sm">(opzionale)</span></h3>
+          <h3 className="font-semibold text-gray-900">
+            Il tuo avatar{" "}
+            <span className="font-normal text-gray-400 text-sm">
+              (opzionale)
+            </span>
+          </h3>
           <p className="text-xs text-gray-500 mt-0.5">
             Appare accanto ai tuoi libri al posto del tuo contatto.
           </p>
@@ -340,7 +389,12 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
               <button
                 key={emoji}
                 type="button"
-                onClick={() => setForm((f) => ({ ...f, avatar_emoji: f.avatar_emoji === emoji ? "" : emoji }))}
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    avatar_emoji: f.avatar_emoji === emoji ? "" : emoji,
+                  }))
+                }
                 className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
                   form.avatar_emoji === emoji
                     ? "border-[#3B6D11] bg-[#EAF3DE] shadow-sm"
@@ -359,7 +413,9 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
             id="nickname"
             placeholder="Es. La lettrice di Gràcia"
             value={form.nickname}
-            onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, nickname: e.target.value }))
+            }
             maxLength={40}
           />
         </div>
@@ -367,7 +423,7 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
 
       {error && (
         <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
-          <AlertTriangle className="w-4 h-4 text-[#A32D2D] flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="w-4 h-4 text-[#A32D2D] shrink-0 mt-0.5" />
           <p className="text-sm text-[#A32D2D]">{error}</p>
         </div>
       )}
@@ -379,7 +435,11 @@ export function GestisciLibroClient({ libro, editToken }: GestisciLibroClientPro
       )}
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Button type="submit" disabled={loading} className="flex-1 sm:flex-none sm:px-8">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="flex-1 sm:flex-none sm:px-8"
+        >
           {loading ? (
             <span className="flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
