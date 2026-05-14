@@ -1,37 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Libri in Giro BCN
 
-## Getting Started
+Piattaforma di scambio libri per la comunità italiana di Barcellona. Gli utenti pubblicano libri che vogliono condividere, altri li richiedono in prestito — tutto senza registrazione.
 
-First, run the development server:
+## Funzionalità
+
+- **Catalogo pubblico** — libri disponibili filtrabili per genere e quartiere
+- **Aggiunta libro** — chiunque può pubblicare un libro; protezione anti-spam con hCaptcha, rate limiting e honeypot
+- **Gestione libro** — il proprietario modifica o rimuove il proprio libro tramite `edit_token` (niente account)
+- **Sistema prestiti** — ciclo di vita completo: `richiesto → confermato → in_corso → restituito`
+- **Scansione ISBN** — ricerca copertina via fotocamera direttamente dal form
+- **Copertine automatiche** — ricerca su Open Library e Google Books tramite titolo + autore
+- **Notifiche Telegram** — bot che avvisa sulle richieste di prestito
+- **Pannello admin** — gestione della piattaforma
+
+## Stack
+
+| Layer | Tecnologia |
+|---|---|
+| Framework | Next.js 16 (App Router, Server Actions) |
+| UI | React 19, Tailwind CSS 4, Radix UI |
+| Database | Supabase (PostgreSQL) |
+| Validazione | Zod |
+| Anti-spam | hCaptcha + honeypot + rate limiting su DB |
+| Barcode | @zxing/browser |
+| Test | Vitest + Testing Library, Playwright (E2E) |
+
+## Sviluppo locale
+
+### Prerequisiti
+
+- Node.js 20+
+- Un progetto Supabase (o locale via `supabase start`)
+
+### Setup
 
 ```bash
+npm install
+cp .env.example .env.local
+# Compila le variabili d'ambiente (vedi sezione sotto)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variabili d'ambiente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+NEXT_PUBLIC_HCAPTCHA_SITE_KEY=
+HCAPTCHA_SECRET_KEY=
 
-## Learn More
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Test
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Unit + integrazione
+npm test
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Con coverage
+npm run test:coverage
 
-## Deploy on Vercel
+# E2E (Playwright)
+npm run test:e2e
+npm run test:e2e:ui   # con interfaccia grafica
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Struttura
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# libri-in-giro-bcn
+```
+app/
+  page.tsx                        # Catalogo pubblico
+  aggiungi/                       # Form aggiunta libro
+  libro/[id]/                     # Dettaglio libro + gestione proprietario
+  prestito/[id]/gestisci/         # Gestione prestito
+  admin/                          # Pannello admin
+  actions/                        # Server Actions (libri, prestiti)
+  api/telegram/                   # Webhook e notifiche Telegram
+lib/
+  types.ts                        # Tipi condivisi (Libro, Prestito, ecc.)
+  validation.ts                   # Schemi Zod
+  rate-limit.ts                   # Rate limiting via tabella Supabase
+  cover-search.ts                 # Ricerca copertine (Open Library + Google Books)
+  hcaptcha.ts                     # Verifica captcha lato server
+```
+
+## Modello dati
+
+**Libri** — titolo, autore, genere, barrio, contatto (Telegram/alternativo), copertina, `edit_token` per la gestione senza autenticazione.
+
+**Prestiti** — collegati a un libro; tracciano richiedente, proprietario, punto di ritiro, stato e date del ciclo di vita.
+
+**Rate limits** — tabella Supabase; limiti: 3 libri/ora, 5 richieste prestito/ora per IP.
+
+## Quartieri supportati
+
+Gràcia · Eixample · Poble Sec / Sant Antoni · Poblenou · Sants
+
+## Comunità
+
+- Canale Telegram: [t.me/LibriInGiroBCN](https://t.me/LibriInGiroBCN)
