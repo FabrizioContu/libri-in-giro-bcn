@@ -32,28 +32,6 @@ Piattaforma di scambio libri per la comunità italiana di Barcellona. Gli utenti
 - Node.js 20+
 - Un progetto Supabase (o locale via `supabase start`)
 
-### Setup
-
-```bash
-npm install
-cp .env.example .env.local
-# Compila le variabili d'ambiente (vedi sezione sotto)
-npm run dev
-```
-
-### Variabili d'ambiente
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-
-NEXT_PUBLIC_HCAPTCHA_SITE_KEY=
-HCAPTCHA_SECRET_KEY=
-
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-```
 
 ## Test
 
