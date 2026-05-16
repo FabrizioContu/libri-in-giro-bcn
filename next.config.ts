@@ -11,6 +11,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["10.5.0.2"],
   images: {
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days — covers never change
     remotePatterns: [
       { protocol: "https", hostname: "**" },
       { protocol: "http", hostname: "**" },

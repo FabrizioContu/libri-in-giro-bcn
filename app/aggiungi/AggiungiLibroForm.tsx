@@ -72,15 +72,13 @@ export function AggiungiLibroForm() {
       const olData = await olRes.json();
       const olBook = olData[`ISBN:${isbn}`];
       if (olBook) {
+        // ISBN-based cover URL is more reliable than the OLID-based one returned by the API
+        const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
         setForm((f) => ({
           ...f,
           titolo: olBook.title || f.titolo,
           autore: olBook.authors?.[0]?.name || f.autore,
-          copertina:
-            olBook.cover?.large ||
-            olBook.cover?.medium ||
-            olBook.cover?.small ||
-            f.copertina,
+          copertina: coverUrl,
         }));
         setIsbnSource(isbn);
         return;
