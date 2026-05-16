@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import { Libro, Prestito } from "@/lib/types";
 import { Header } from "@/components/Header";
@@ -10,6 +10,8 @@ import { LibroDetailClient } from "./LibroDetailClient";
 import { GestisciButton } from "@/components/GestisciButton";
 import { AvatarNickname } from "@/components/AvatarNickname";
 import { CopyTokenButton } from "@/components/CopyTokenButton";
+import CopertinaImage from "@/components/CopertinaImage";
+import CopertinaPH from "@/components/CopertinaPH";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
@@ -21,6 +23,29 @@ async function getLibro(id: string): Promise<Libro | null> {
 
   if (error || !data) return null;
   return data;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const libro = await getLibro(id);
+
+  if (!libro) return { title: "Libro non trovato" };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const pageUrl = `${siteUrl}/libro/${id}`;
+  const description = `di ${libro.autore}${libro.barrio ? ` · ${libro.barrio}` : ""} — ${libro.disponibile ? "Disponibile" : "Non disponibile"}`;
+
+  return {
+    title: `${libro.titolo} — Libri in Giro BCN`,
+    description,
+    openGraph: {
+      title: libro.titolo,
+      description,
+      url: pageUrl,
+      type: "book",
+      ...(libro.copertina_url ? { images: [{ url: libro.copertina_url, width: 400, height: 600 }] } : {}),
+    },
+  };
 }
 
 async function getPrestiti(libroId: string): Promise<Prestito[]> {
@@ -150,24 +175,18 @@ export default async function LibroPage({ params, searchParams }: Props) {
         <div className="flex flex-col sm:flex-row gap-8">
           {/* Cover */}
           <div className="shrink-0 mx-auto sm:mx-0">
-            {libro.copertina_url ? (
-              <div className="relative w-[200px] h-[300px] sm:w-[220px] sm:h-[330px] rounded-2xl overflow-hidden shadow-md">
-                <Image
+            <div className="relative w-[200px] h-[300px] sm:w-[220px] sm:h-[330px] rounded-2xl overflow-hidden shadow-md">
+              {libro.copertina_url ? (
+                <CopertinaImage
                   src={libro.copertina_url}
-                  alt={"Copertina di " + libro.titolo}
-                  fill
-                  sizes="220px"
-                  className="object-cover"
-                  priority
+                  titolo={libro.titolo}
+                  autore={libro.autore}
+                  genere={libro.genere}
                 />
-              </div>
-            ) : (
-              <div className="w-[200px] h-[300px] sm:w-[220px] sm:h-[330px] rounded-2xl bg-[#EAF3DE] flex items-center justify-center shadow-md">
-                <span className="text-7xl font-bold text-[#3B6D11] select-none">
-                  {libro.autore.trim().split(' ').pop()?.[0].toUpperCase()}
-                </span>
-              </div>
-            )}
+              ) : (
+                <CopertinaPH autore={libro.autore} genere={libro.genere} size="lg" />
+              )}
+            </div>
           </div>
 
           {/* Info */}
