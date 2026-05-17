@@ -78,5 +78,27 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
 
   if (error) return { success: false, error: "Errore durante l'inserimento. Riprova." };
 
+  const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (groupChatId && botToken) {
+    const host = headersList.get("host") ?? "";
+    const protocol = host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.") ? "http" : "https";
+    const libroUrl = `${protocol}://${host}/libro/${data.id}`;
+
+    const parts = [
+      `📚 Nuovo libro disponibile!\n`,
+      `"${data.titolo}" di ${data.autore}`,
+      data.barrio ? `📍 ${data.barrio}` : null,
+      data.genere ? `🏷️ ${data.genere}` : null,
+      `\n➡️ ${libroUrl}`,
+    ].filter(Boolean).join("\n");
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: groupChatId, text: parts }),
+    }).catch(() => {});
+  }
+
   return { success: true, id: data.id, edit_token: data.edit_token };
 }
