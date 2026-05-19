@@ -93,11 +93,15 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
       `\n➡️ ${libroUrl}`,
     ].filter(Boolean).join("\n");
 
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: groupChatId, text: parts }),
-    }).catch(() => {});
+    }).catch((err: unknown) => { console.error("[telegram] fetch error:", err); return null; });
+    if (tgRes) {
+      const tgJson = await tgRes.json().catch(() => null);
+      console.log("[telegram] response:", JSON.stringify(tgJson));
+    }
   }
 
   return { success: true, id: data.id, edit_token: data.edit_token };
