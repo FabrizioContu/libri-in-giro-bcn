@@ -80,6 +80,7 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
 
   const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  console.log("[telegram] groupChatId:", !!groupChatId, "botToken:", !!botToken);
   if (groupChatId && botToken) {
     const host = headersList.get("host") ?? "";
     const protocol = host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.") ? "http" : "https";
