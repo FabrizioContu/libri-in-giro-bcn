@@ -80,7 +80,6 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
 
   const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  console.log("[telegram] groupChatId:", !!groupChatId, "botToken:", !!botToken);
   if (groupChatId && botToken) {
     const host = headersList.get("host") ?? "";
     const protocol = host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.") ? "http" : "https";
@@ -94,15 +93,11 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
       `\n➡️ ${libroUrl}`,
     ].filter(Boolean).join("\n");
 
-    const tgRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: groupChatId, text: parts }),
-    }).catch((err: unknown) => { console.error("[telegram] fetch error:", err); return null; });
-    if (tgRes) {
-      const tgJson = await tgRes.json().catch(() => null);
-      console.log("[telegram] response:", JSON.stringify(tgJson));
-    }
+    }).catch(() => {});
   }
 
   return { success: true, id: data.id, edit_token: data.edit_token };
