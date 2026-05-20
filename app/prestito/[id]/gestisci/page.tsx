@@ -7,6 +7,7 @@ import { TimelinePrestito } from "@/components/TimelinePrestito";
 import { GestisciPrestitoClient } from "./GestisciPrestitoClient";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, MapPin } from "lucide-react";
+import { RispondiButton } from "@/components/RispondiButton";
 
 async function getPrestitoByToken(
   id: string,
@@ -115,6 +116,13 @@ export default async function GestisciPrestitoPage({ params, searchParams }: Pro
               </div>
             )}
           </div>
+
+          <RispondiButton
+            tipo={prestito.richiedente_tipo}
+            contatto={prestito.richiedente_contatto}
+            titolo={libro.titolo}
+            autore={libro.autore}
+          />
 
           {/* Countdown */}
           {daysLeft !== null && (
