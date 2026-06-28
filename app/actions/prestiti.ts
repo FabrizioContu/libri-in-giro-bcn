@@ -18,7 +18,7 @@ export interface CreatePrestitoInput {
 }
 
 export type CreatePrestitoResult =
-  | { success: true; id: string; edit_token: string }
+  | { success: true; id: string; edit_token: string; notifySent: boolean }
   | { success: false; error: string };
 
 export async function createPrestito(
@@ -71,5 +71,55 @@ export async function createPrestito(
 
   if (error) return { success: false, error: "Errore durante l'inserimento. Riprova." };
 
-  return { success: true, id: data.id, edit_token: data.edit_token };
+  // Notifica automatica al proprietario via bot Telegram.
+  // Eseguita interamente lato server con dati validati: il client non può
+  // iniettare contenuto arbitrario nel messaggio inviato al proprietario.
+  let notifySent = false;
+  try {
+    const { data: libro } = await supabaseServer
+      .from("libri")
+      .select("telegram_chat_id, titolo, autore")
+      .eq("id", parsed.data.libro_id)
+      .single();
+
+    if (libro?.telegram_chat_id) {
+      const host = headersList.get("host") ?? "";
+      const protocol =
+        host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.")
+          ? "http"
+          : "https";
+      const manageUrl = `${protocol}://${host}/prestito/${data.id}/gestisci?token=${data.edit_token}`;
+
+      const contattoLabel =
+        parsed.data.richiedente_tipo === "telegram"
+          ? `Telegram: ${parsed.data.richiedente_contatto}`
+          : `WhatsApp: +${parsed.data.richiedente_contatto}`;
+
+      const text =
+        `📚 Nuova richiesta di prestito!\n\n` +
+        `"${libro.titolo}" di ${libro.autore}\n\n` +
+        `Un utente vuole prendere in prestito il tuo libro.\n` +
+        `Contattalo su ${contattoLabel}.\n\n` +
+        `➡️ Gestisci la richiesta:\n${manageUrl}`;
+
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      if (botToken) {
+        const res = await fetch(
+          `https://api.telegram.org/bot${botToken}/sendMessage`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: libro.telegram_chat_id, text }),
+          }
+        );
+        const result = await res.json();
+        notifySent = result.ok === true;
+      }
+    }
+  } catch (err) {
+    // Non bloccare il flusso: il richiedente ha comunque i link di contatto manuali
+    console.error("Telegram notify error:", err);
+  }
+
+  return { success: true, id: data.id, edit_token: data.edit_token, notifySent };
 }

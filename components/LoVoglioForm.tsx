@@ -109,23 +109,9 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
 
       const ownerHasTelegram = !!libro.telegram;
 
-      // Notifica automatica via bot se il proprietario ha attivato le notifiche
-      let notifySent = false;
-      try {
-        const notifyRes = await fetch("/api/telegram/notify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            libroId: libro.id,
-            prestitoId,
-            richiedenteContatto: contatto,
-            richiedenteTipo: tab,
-            manageUrl,
-          }),
-        });
-        const notifyData = await notifyRes.json();
-        notifySent = notifyData.ok === true;
-      } catch { /* non bloccare il flusso */ }
+      // La notifica automatica al proprietario viene inviata lato server da
+      // createPrestito, con dati validati. Qui leggiamo solo l'esito.
+      const notifySent = result.notifySent;
 
       // Messaggio in prima persona — il richiedente lo manda direttamente al proprietario
       const contattoLabel =

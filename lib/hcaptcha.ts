@@ -5,7 +5,13 @@ export async function verifyHcaptcha(token: string): Promise<boolean> {
 
   const secret = process.env.HCAPTCHA_SECRET_KEY;
   if (!secret) {
-    // Dev: skip verification if key not configured
+    // In sviluppo: salta la verifica se la chiave non è configurata.
+    // In produzione: fail-closed — senza chiave NON si passa, così una
+    // env var mancante non disattiva silenziosamente il captcha.
+    if (process.env.NODE_ENV === "production") {
+      console.error("HCAPTCHA_SECRET_KEY mancante in produzione — richiesta rifiutata.");
+      return false;
+    }
     return true;
   }
 
