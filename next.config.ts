@@ -36,9 +36,12 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["10.5.0.2"],
   images: {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days — covers never change
+    // Allowlist esplicita: le copertine arrivano SOLO da Open Library o dal
+    // fallback Google Books (vedi lib/cover-search.ts). Il wildcard "**"
+    // trasformava /_next/image in un open proxy (SSRF + abuso di banda).
     remotePatterns: [
-      { protocol: "https", hostname: "**" },
-      { protocol: "http", hostname: "**" },
+      { protocol: "https", hostname: "covers.openlibrary.org" },
+      { protocol: "https", hostname: "books.google.com" },
     ],
   },
   turbopack: {
