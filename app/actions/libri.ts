@@ -81,9 +81,10 @@ export async function createLibro(input: CreateLibroInput): Promise<CreateLibroR
   const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID;
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (groupChatId && botToken) {
-    const host = headersList.get("host") ?? "";
-    const protocol = host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.") ? "http" : "https";
-    const libroUrl = `${protocol}://${host}/libro/${data.id}`;
+    // URL costruita da una env trusted, MAI dall'header Host (host poisoning):
+    // l'attaccante potrebbe iniettare un dominio malevolo nella notifica.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const libroUrl = `${siteUrl}/libro/${data.id}`;
 
     const parts = [
       `📚 Nuovo libro disponibile!\n`,

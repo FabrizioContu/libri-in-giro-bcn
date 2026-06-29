@@ -83,12 +83,10 @@ export async function createPrestito(
       .single();
 
     if (libro?.telegram_chat_id) {
-      const host = headersList.get("host") ?? "";
-      const protocol =
-        host.startsWith("localhost") || host.startsWith("10.") || host.startsWith("192.")
-          ? "http"
-          : "https";
-      const manageUrl = `${protocol}://${host}/prestito/${data.id}/gestisci?token=${data.edit_token}`;
+      // URL costruita da una env trusted, MAI dall'header Host (host poisoning):
+      // l'attaccante potrebbe iniettare un dominio malevolo nella notifica.
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+      const manageUrl = `${siteUrl}/prestito/${data.id}/gestisci?token=${data.edit_token}`;
 
       const contattoLabel =
         parsed.data.richiedente_tipo === "telegram"
