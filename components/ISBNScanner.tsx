@@ -3,13 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Keyboard } from "lucide-react";
+import { ISBN13_RE } from "@/lib/isbn-lookup";
 
 interface ISBNScannerProps {
   onDetected: (isbn: string) => void;
   onClose: () => void;
 }
-
-const ISBN13_RE = /^97[89]\d{10}$/;
 
 export function ISBNScanner({ onDetected, onClose }: ISBNScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -18,6 +17,7 @@ export function ISBNScanner({ onDetected, onClose }: ISBNScannerProps) {
   const [manualMode, setManualMode] = useState(false);
   const [manualIsbn, setManualIsbn] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
 
   useEffect(() => {
     if (manualMode) return;
@@ -48,7 +48,9 @@ export function ISBNScanner({ onDetected, onClose }: ISBNScannerProps) {
           setCameraReady(true);
         })
         .catch(() => {
-          if (!cancelled) setManualMode(true);
+          if (cancelled) return;
+          setCameraError(true);
+          setManualMode(true);
         });
     });
 
@@ -59,30 +61,44 @@ export function ISBNScanner({ onDetected, onClose }: ISBNScannerProps) {
   }, [manualMode, onDetected]);
 
   if (manualMode) {
+    // Niente <form> qui: lo scanner vive dentro il form di AggiungiLibroForm e
+    // un form annidato faceva un submit nativo che ricaricava la pagina.
+    const submitManual = () => {
+      const isbn = manualIsbn.replace(/[-\s]/g, "");
+      if (ISBN13_RE.test(isbn)) onDetected(isbn);
+    };
+
     return (
-      <form
-        className="flex gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const isbn = manualIsbn.replace(/[-\s]/g, "");
-          if (ISBN13_RE.test(isbn)) onDetected(isbn);
-        }}
-      >
-        <Input
-          placeholder="ISBN-13 (es. 9788804668237)"
-          value={manualIsbn}
-          onChange={(e) => setManualIsbn(e.target.value)}
-          className="text-sm"
-          autoFocus
-          inputMode="numeric"
-        />
-        <Button type="submit" size="sm">
-          Cerca
-        </Button>
-        <Button type="button" size="sm" variant="ghost" onClick={onClose} aria-label="Chiudi">
-          <X className="w-4 h-4" />
-        </Button>
-      </form>
+      <div className="space-y-1.5">
+        {cameraError && (
+          <p className="text-xs text-gray-500">
+            Fotocamera non disponibile. Inserisci l&apos;ISBN a mano.
+          </p>
+        )}
+        <div className="flex gap-2">
+          <Input
+            placeholder="ISBN-13 (es. 9788804668237)"
+            value={manualIsbn}
+            onChange={(e) => setManualIsbn(e.target.value)}
+            onKeyDown={(e) => {
+              // Invio non deve inviare il form del libro
+              if (e.key === "Enter") {
+                e.preventDefault();
+                submitManual();
+              }
+            }}
+            className="text-sm"
+            autoFocus
+            inputMode="numeric"
+          />
+          <Button type="button" size="sm" onClick={submitManual}>
+            Cerca
+          </Button>
+          <Button type="button" size="sm" variant="ghost" onClick={onClose} aria-label="Chiudi">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
     );
   }
 
