@@ -1,10 +1,13 @@
+const TIMEOUT_MS = 5000;
+
 export async function fetchCoverByTitleAuthor(
   titolo: string,
   autore: string
 ): Promise<string | null> {
   try {
     const olRes = await fetch(
-      `https://openlibrary.org/search.json?title=${encodeURIComponent(titolo)}&author=${encodeURIComponent(autore)}&limit=1&fields=cover_i`
+      `https://openlibrary.org/search.json?title=${encodeURIComponent(titolo)}&author=${encodeURIComponent(autore)}&limit=1&fields=cover_i`,
+      { signal: AbortSignal.timeout(TIMEOUT_MS) }
     );
     const olData = await olRes.json();
     const coverId = olData.docs?.[0]?.cover_i;
@@ -13,7 +16,8 @@ export async function fetchCoverByTitleAuthor(
     }
 
     const gbRes = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(titolo)}+inauthor:${encodeURIComponent(autore)}&maxResults=1`
+      `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(titolo)}+inauthor:${encodeURIComponent(autore)}&maxResults=1`,
+      { signal: AbortSignal.timeout(TIMEOUT_MS) }
     );
     const gbData = await gbRes.json();
     const thumbnail = gbData.items?.[0]?.volumeInfo?.imageLinks?.thumbnail?.replace(

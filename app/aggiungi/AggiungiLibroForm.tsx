@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import { BookPlus, AlertTriangle, Scan, CheckCircle } from "lucide-react";
 import { ISBNScanner } from "@/components/ISBNScanner";
-import { fetchCoverByTitleAuthor } from "@/lib/cover-search";
+import { searchCover, searchIsbn } from "@/lib/book-lookup-client";
 
 const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
 
@@ -44,6 +44,8 @@ export function AggiungiLibroForm() {
       const savedNickname = localStorage.getItem("lgbcn_nickname") ?? "";
       const savedEmoji = localStorage.getItem("lgbcn_avatar_emoji") ?? "";
       if (savedNickname || savedEmoji) {
+        // Lettura post-mount voluta: in render romperebbe l'hydration (niente localStorage su SSR).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setForm((f) => ({ ...f, nickname: savedNickname, avatar_emoji: savedEmoji }));
       }
     } catch { /* localStorage non disponibile */ }
@@ -59,52 +61,29 @@ export function AggiungiLibroForm() {
   const [coverSearchLoading, setCoverSearchLoading] = useState(false);
   const [coverAutoFound, setCoverAutoFound] = useState(false);
   const copertinaCurrent = useRef(form.copertina);
-  copertinaCurrent.current = form.copertina;
+  useEffect(() => {
+    copertinaCurrent.current = form.copertina;
+  }, [form.copertina]);
 
   const handleIsbnDetected = async (isbn: string) => {
     setShowScanner(false);
     setIsbnLoading(true);
     setError(null);
-    try {
-      const olRes = await fetch(
-        `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
-      );
-      const olData = await olRes.json();
-      const olBook = olData[`ISBN:${isbn}`];
-      if (olBook) {
-        // ISBN-based cover URL is more reliable than the OLID-based one returned by the API
-        const coverUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-        setForm((f) => ({
-          ...f,
-          titolo: olBook.title || f.titolo,
-          autore: olBook.authors?.[0]?.name || f.autore,
-          copertina: coverUrl,
-        }));
-        setIsbnSource(isbn);
-        return;
-      }
-      const gbRes = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`
-      );
-      const gbData = await gbRes.json();
-      const gbBook = gbData.items?.[0]?.volumeInfo;
-      if (gbBook) {
-        setForm((f) => ({
-          ...f,
-          titolo: gbBook.title || f.titolo,
-          autore: gbBook.authors?.[0] || f.autore,
-          copertina:
-            gbBook.imageLinks?.thumbnail?.replace("http:", "https:") ||
-            f.copertina,
-        }));
-        setIsbnSource(isbn);
-        return;
-      }
+    const result = await searchIsbn(isbn);
+    setIsbnLoading(false);
+    if (result.status === "found") {
+      const { book } = result;
+      setForm((f) => ({
+        ...f,
+        titolo: book.titolo || f.titolo,
+        autore: book.autore || f.autore,
+        copertina: book.copertina_url || f.copertina,
+      }));
+      setIsbnSource(isbn);
+    } else if (result.status === "not_found") {
       setError("ISBN non trovato nelle banche dati. Inserisci i dettagli manualmente.");
-    } catch {
+    } else {
       setError("Errore durante la ricerca del libro. Riprova.");
-    } finally {
-      setIsbnLoading(false);
     }
   };
 
@@ -115,7 +94,7 @@ export function AggiungiLibroForm() {
     const tid = setTimeout(async () => {
       if (copertinaCurrent.current) return;
       setCoverSearchLoading(true);
-      const url = await fetchCoverByTitleAuthor(form.titolo, form.autore);
+      const url = await searchCover(form.titolo, form.autore);
       setCoverSearchLoading(false);
       if (url) {
         setForm((f) => ({ ...f, copertina: f.copertina || url }));
@@ -124,7 +103,7 @@ export function AggiungiLibroForm() {
     }, 1000);
 
     return () => clearTimeout(tid);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [form.titolo, form.autore, isbnSource]);
 
   const handleSubmit = async (e: React.FormEvent) => {

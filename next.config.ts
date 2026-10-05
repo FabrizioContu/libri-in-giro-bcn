@@ -4,6 +4,7 @@ import path from "path";
 // Hosts that the browser is legitimately allowed to talk to.
 // Supabase: il client anon viene usato lato browser (rpc, select).
 // hCaptcha: script + iframe della verifica anti-bot.
+// Open Library / Google Books NON vanno qui: le ricerche passano da /api/lookup/*.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseHost = supabaseUrl.replace(/^https?:\/\//, "");
 const supabaseWs = supabaseHost ? `wss://${supabaseHost}` : "";
@@ -29,7 +30,7 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
 ];
 
 const nextConfig: NextConfig = {
@@ -37,7 +38,7 @@ const nextConfig: NextConfig = {
   images: {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days — covers never change
     // Allowlist esplicita: le copertine arrivano SOLO da Open Library o dal
-    // fallback Google Books (vedi lib/cover-search.ts). Il wildcard "**"
+    // fallback Google Books (vedi lib/cover-search.ts e lib/isbn-lookup.ts). Il wildcard "**"
     // trasformava /_next/image in un open proxy (SSRF + abuso di banda).
     remotePatterns: [
       { protocol: "https", hostname: "covers.openlibrary.org" },

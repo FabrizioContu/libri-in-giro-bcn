@@ -24,7 +24,7 @@ import {
   Search,
   CheckCircle,
 } from "lucide-react";
-import { fetchCoverByTitleAuthor } from "@/lib/cover-search";
+import { searchCover } from "@/lib/book-lookup-client";
 
 const AVATAR_EMOJIS = [
   "📚",
@@ -141,7 +141,7 @@ export function GestisciLibroClient({
 
   const handleCoverSearch = async () => {
     setCoverSearchLoading(true);
-    const url = await fetchCoverByTitleAuthor(form.titolo, form.autore);
+    const url = await searchCover(form.titolo, form.autore);
     setCoverSearchLoading(false);
     if (url) setForm((f) => ({ ...f, copertina: url }));
   };
