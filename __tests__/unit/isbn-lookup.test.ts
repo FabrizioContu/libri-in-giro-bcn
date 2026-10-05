@@ -5,25 +5,40 @@ import { lookupBookByIsbn, ISBN13_RE } from "@/lib/isbn-lookup";
 const ISBN = "9788804668237";
 
 const ok = (body: unknown) => ({ ok: true, status: 200, json: () => Promise.resolve(body) });
+// Risposte alla HEAD di verifica copertina (covers.openlibrary.org ?default=false)
+const coverExists = { ok: false, status: 302 };
+const coverMissing = { ok: false, status: 404 };
 
 describe("lookupBookByIsbn", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("returns Open Library data with the ISBN-based cover", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValueOnce(
+  it("returns Open Library data with the verified ISBN-based cover", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(
         ok({ [`ISBN:${ISBN}`]: { title: "Il nome della rosa", authors: [{ name: "Umberto Eco" }] } })
       )
-    );
+      .mockResolvedValueOnce(coverExists);
+    vi.stubGlobal("fetch", fetchMock);
 
     expect(await lookupBookByIsbn(ISBN)).toEqual({
       titolo: "Il nome della rosa",
       autore: "Umberto Eco",
-      copertina_url: `https://covers.openlibrary.org/b/isbn/${ISBN}-L.jpg`,
+      copertina_url: `https://covers.openlibrary.org/b/isbn/${ISBN}-L.jpg?default=false`,
     });
+    expect(fetchMock.mock.calls[1][1]).toMatchObject({ method: "HEAD", redirect: "manual" });
+  });
+
+  it("returns no cover when Open Library has none (instead of the blank 1x1 GIF)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn()
+        .mockResolvedValueOnce(ok({ [`ISBN:${ISBN}`]: { title: "T", authors: [{ name: "A" }] } }))
+        .mockResolvedValueOnce(coverMissing)
+    );
+
+    expect((await lookupBookByIsbn(ISBN))?.copertina_url).toBeNull();
   });
 
   it("falls back to Google Books and upgrades the thumbnail to https", async () => {
@@ -98,7 +113,9 @@ describe("lookupBookByIsbn", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValueOnce(ok({ [`ISBN:${ISBN}`]: { title: "t", authors: [] } }))
+      vi.fn()
+        .mockResolvedValueOnce(ok({ [`ISBN:${ISBN}`]: { title: "t", authors: [] } }))
+        .mockResolvedValueOnce(coverExists)
     );
     const ol = await lookupBookByIsbn(ISBN);
     expect(allowed.has(new URL(ol!.copertina_url!).hostname)).toBe(true);

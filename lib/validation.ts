@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GENERI, BARRIOS } from "./types";
+import { isAllowedCoverUrl } from "./cover-hosts";
 
 export const libroSchema = z.object({
   titolo: z.string().min(1).max(200).trim(),
@@ -8,7 +9,13 @@ export const libroSchema = z.object({
   barrio: z.enum(BARRIOS as [string, ...string[]]),
   telegram: z.string().max(100).trim().nullable().optional(),
   contatto_alternativo: z.string().max(20).trim().nullable().optional(),
-  copertina_url: z.string().max(500).trim().nullable().optional(),
+  copertina_url: z
+    .string()
+    .max(500)
+    .trim()
+    .refine(isAllowedCoverUrl, "copertina_url host not allowed")
+    .nullable()
+    .optional(),
   note: z.string().max(1000).trim().nullable().optional(),
   nickname: z.string().max(40).trim().nullable().optional(),
   avatar_emoji: z.string().max(10).nullable().optional(),

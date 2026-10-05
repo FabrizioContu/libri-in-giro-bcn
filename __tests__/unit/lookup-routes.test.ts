@@ -16,7 +16,10 @@ import { fetchCoverByTitleAuthor } from "@/lib/cover-search";
 const req = (path: string) => new NextRequest(`http://localhost${path}`);
 
 describe("GET /api/lookup/isbn", () => {
-  beforeEach(() => vi.mocked(lookupBookByIsbn).mockReset());
+  beforeEach(() => {
+    vi.mocked(lookupBookByIsbn).mockReset();
+    vi.mocked(fetchCoverByTitleAuthor).mockReset().mockResolvedValue(null);
+  });
 
   it("rejects malformed ISBNs without calling upstream", async () => {
     const res = await getIsbn(req("/api/lookup/isbn?isbn=hello"));
@@ -25,13 +28,22 @@ describe("GET /api/lookup/isbn", () => {
   });
 
   it("normalises dashes and returns the book", async () => {
-    const book = { titolo: "T", autore: "A", copertina_url: null };
+    const book = { titolo: "T", autore: "A", copertina_url: "https://covers.openlibrary.org/b/id/1-M.jpg" };
     vi.mocked(lookupBookByIsbn).mockResolvedValueOnce(book);
 
     const res = await getIsbn(req("/api/lookup/isbn?isbn=978-88-04-66823-7"));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual(book);
     expect(lookupBookByIsbn).toHaveBeenCalledWith("9788804668237");
+  });
+
+  it("falls back to a title/author cover search when the edition has no cover", async () => {
+    vi.mocked(lookupBookByIsbn).mockResolvedValueOnce({ titolo: "T", autore: "A", copertina_url: null });
+    vi.mocked(fetchCoverByTitleAuthor).mockResolvedValueOnce("https://covers.openlibrary.org/b/id/9-M.jpg");
+
+    const res = await getIsbn(req("/api/lookup/isbn?isbn=9788804668237"));
+    expect((await res.json()).copertina_url).toBe("https://covers.openlibrary.org/b/id/9-M.jpg");
+    expect(fetchCoverByTitleAuthor).toHaveBeenCalledWith("T", "A");
   });
 
   it("returns 404 when the ISBN is unknown", async () => {

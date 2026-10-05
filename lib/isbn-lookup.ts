@@ -8,6 +8,23 @@ export interface IsbnLookupResult {
 
 const TIMEOUT_MS = 5000;
 
+// Senza ?default=false Open Library risponde 200 con un GIF trasparente 1x1
+// quando la copertina non esiste: il form mostrava "Copertina dall'ISBN" vuota.
+// Con default=false risponde 404, e il 302 verso archive.org indica che esiste.
+async function openLibraryCover(isbn: string): Promise<string | null> {
+  const url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "manual",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    return res.status >= 200 && res.status < 400 ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fromOpenLibrary(isbn: string): Promise<IsbnLookupResult | null> {
   const res = await fetch(
     `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`,
@@ -20,7 +37,7 @@ async function fromOpenLibrary(isbn: string): Promise<IsbnLookupResult | null> {
     titolo: book.title ?? "",
     autore: book.authors?.[0]?.name ?? "",
     // ISBN-based cover URL is more reliable than the OLID-based one returned by the API
-    copertina_url: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
+    copertina_url: await openLibraryCover(isbn),
   };
 }
 

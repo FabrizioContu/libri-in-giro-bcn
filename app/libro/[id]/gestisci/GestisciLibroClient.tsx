@@ -25,6 +25,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { searchCover } from "@/lib/book-lookup-client";
+import { isAllowedCoverUrl, COVER_URL_ERROR } from "@/lib/cover-hosts";
 
 const AVATAR_EMOJIS = [
   "📚",
@@ -78,10 +79,20 @@ export function GestisciLibroClient({
   const [success, setSuccess] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Si valida solo una copertina modificata: libri vecchi con host non in
+  // allowlist devono poter essere salvati (e cambiare disponibilità) lo stesso.
+  const copertinaChanged = form.copertina.trim() !== (libro.copertina_url ?? "");
+  const copertinaInvalid =
+    copertinaChanged && !!form.copertina.trim() && !isAllowedCoverUrl(form.copertina.trim());
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
+    if (copertinaInvalid) {
+      setError(COVER_URL_ERROR);
+      return;
+    }
     setLoading(true);
 
     const result = await aggiornaLibro({
@@ -309,11 +320,12 @@ export function GestisciLibroClient({
             <Input
               id="copertina"
               type="url"
-              placeholder="https://..."
+              placeholder="https://covers.openlibrary.org/..."
               value={form.copertina}
               onChange={(e) =>
                 setForm((f) => ({ ...f, copertina: e.target.value }))
               }
+              aria-invalid={copertinaInvalid}
             />
             <button
               type="button"
@@ -329,7 +341,10 @@ export function GestisciLibroClient({
               <span className="hidden sm:inline text-gray-600">Cerca</span>
             </button>
           </div>
-          {(coverSearchLoading || form.copertina) && (
+          {copertinaInvalid && (
+            <p className="text-xs text-[#A32D2D]">{COVER_URL_ERROR}</p>
+          )}
+          {(coverSearchLoading || (form.copertina && !copertinaInvalid)) && (
             <div className="flex items-center gap-3 pt-1">
               <div className="shrink-0 w-11 h-14 rounded border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
                 {coverSearchLoading ? (

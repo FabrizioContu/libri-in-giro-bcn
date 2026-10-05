@@ -61,6 +61,22 @@ test.describe("Add book form", () => {
     });
   });
 
+  test("prefills the contact used last time", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("lgbcn_contact_tab", "altro");
+      localStorage.setItem("lgbcn_whatsapp", "34 612 345 678");
+    });
+    await page.goto("/aggiungi");
+    await expect(page.getByRole("tab", { name: /whatsapp/i })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByPlaceholder("34 612 345 678")).toHaveValue("34 612 345 678");
+  });
+
+  test("warns about a cover URL from a host that cannot be displayed", async ({ page }) => {
+    await page.goto("/aggiungi");
+    await page.getByLabel(/url copertina/i).fill("https://upload.wikimedia.org/cover.jpg");
+    await expect(page.getByText(/usa un link di copertina da open library/i)).toBeVisible();
+  });
+
   test("allows camera access for the ISBN scanner", async ({ page }) => {
     const res = await page.goto("/aggiungi");
     expect(res?.headers()["permissions-policy"]).toContain("camera=(self)");

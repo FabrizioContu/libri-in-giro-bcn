@@ -20,6 +20,7 @@ import Link from "next/link";
 import { BookPlus, AlertTriangle, Scan, CheckCircle } from "lucide-react";
 import { ISBNScanner } from "@/components/ISBNScanner";
 import { searchCover, searchIsbn } from "@/lib/book-lookup-client";
+import { isAllowedCoverUrl, COVER_URL_ERROR } from "@/lib/cover-hosts";
 
 const AVATAR_EMOJIS = ["📚","🦊","🌙","🌿","🌻","🍀","🎭","🎨","🦋","🌊","⭐","🎵","🦉","🐙","🌺","🍄"];
 
@@ -41,13 +42,16 @@ export function AggiungiLibroForm() {
 
   useEffect(() => {
     try {
-      const savedNickname = localStorage.getItem("lgbcn_nickname") ?? "";
-      const savedEmoji = localStorage.getItem("lgbcn_avatar_emoji") ?? "";
-      if (savedNickname || savedEmoji) {
-        // Lettura post-mount voluta: in render romperebbe l'hydration (niente localStorage su SSR).
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setForm((f) => ({ ...f, nickname: savedNickname, avatar_emoji: savedEmoji }));
-      }
+      const saved = {
+        nickname: localStorage.getItem("lgbcn_nickname") ?? "",
+        avatar_emoji: localStorage.getItem("lgbcn_avatar_emoji") ?? "",
+        telegram: localStorage.getItem("lgbcn_telegram") ?? "",
+        contattoAlt: localStorage.getItem("lgbcn_whatsapp") ?? "",
+      };
+      // Lettura post-mount voluta: in render romperebbe l'hydration (niente localStorage su SSR).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm((f) => ({ ...f, ...saved }));
+      if (localStorage.getItem("lgbcn_contact_tab") === "altro") setContactTab("altro");
     } catch { /* localStorage non disponibile */ }
   }, []);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -64,6 +68,8 @@ export function AggiungiLibroForm() {
   useEffect(() => {
     copertinaCurrent.current = form.copertina;
   }, [form.copertina]);
+
+  const copertinaInvalid = !!form.copertina.trim() && !isAllowedCoverUrl(form.copertina.trim());
 
   const handleIsbnDetected = async (isbn: string) => {
     setShowScanner(false);
@@ -133,6 +139,10 @@ export function AggiungiLibroForm() {
       setError("Inserisci almeno un contatto.");
       return;
     }
+    if (form.copertina.trim() && !isAllowedCoverUrl(form.copertina.trim())) {
+      setError(COVER_URL_ERROR);
+      return;
+    }
 
     if (!turnstileToken) {
       setError("Attendere il completamento della verifica di sicurezza.");
@@ -177,6 +187,10 @@ export function AggiungiLibroForm() {
       localStorage.setItem("lgbcn_tokens", JSON.stringify(stored));
       if (form.nickname.trim()) localStorage.setItem("lgbcn_nickname", form.nickname.trim());
       if (form.avatar_emoji) localStorage.setItem("lgbcn_avatar_emoji", form.avatar_emoji);
+      // Chi aggiunge più libri non deve riscrivere il contatto ogni volta
+      localStorage.setItem("lgbcn_contact_tab", contactTab);
+      if (telegramVal) localStorage.setItem("lgbcn_telegram", telegramVal);
+      if (contattoAltVal) localStorage.setItem("lgbcn_whatsapp", contattoAltVal);
     } catch {
       // localStorage non disponibile — non bloccare il flusso
     }
@@ -247,7 +261,7 @@ export function AggiungiLibroForm() {
           </div>
         </div>
 
-        {(coverSearchLoading || form.copertina) && (
+        {(coverSearchLoading || (form.copertina && !copertinaInvalid)) && (
           <div className="flex items-center gap-3 pt-1">
             <div className="shrink-0 w-11 h-14 rounded border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
               {coverSearchLoading ? (
@@ -450,13 +464,19 @@ export function AggiungiLibroForm() {
           <Input
             id="copertina"
             type="url"
-            placeholder="https://upload.wikimedia.org/..."
+            placeholder="https://covers.openlibrary.org/..."
             value={form.copertina}
             onChange={(e) => setForm((f) => ({ ...f, copertina: e.target.value }))}
+            aria-invalid={copertinaInvalid}
           />
-          <p className="text-xs text-gray-400">
-            Trovata automaticamente dal titolo. Puoi incollarla manualmente se vuoi cambiare.
-          </p>
+          {copertinaInvalid ? (
+            <p className="text-xs text-[#A32D2D]">{COVER_URL_ERROR}</p>
+          ) : (
+            <p className="text-xs text-gray-400">
+              Trovata automaticamente dal titolo. Puoi incollare un link da Open Library o Google
+              Books se vuoi cambiarla.
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
