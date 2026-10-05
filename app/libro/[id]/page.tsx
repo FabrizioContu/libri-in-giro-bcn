@@ -12,6 +12,8 @@ import { AvatarNickname } from "@/components/AvatarNickname";
 import { CopyTokenButton } from "@/components/CopyTokenButton";
 import CopertinaImage from "@/components/CopertinaImage";
 import CopertinaPH from "@/components/CopertinaPH";
+import { ShareLibroButton } from "@/components/ShareLibroButton";
+import { buildShareLinks } from "@/lib/share";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 async function getLibro(id: string): Promise<Libro | null> {
@@ -83,31 +85,8 @@ export default async function LibroPage({ params, searchParams }: Props) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-  const shareText =
-    'Ho appena aggiunto "' +
-    libro.titolo +
-    '" di ' +
-    libro.autore +
-    " al catalogo di Libri in Giro BCN! Disponibile a " +
-    (libro.barrio ?? "Barcellona") +
-    " → " +
-    siteUrl + "/libro/" + libro.id;
-
-  const shareUrl =
-    "https://t.me/share/url?url=" +
-    encodeURIComponent(siteUrl + "/libro/" + libro.id) +
-    "&text=" +
-    encodeURIComponent(
-      'Ho appena aggiunto "' +
-        libro.titolo +
-        '" di ' +
-        libro.autore +
-        " al catalogo di Libri in Giro BCN! Disponibile a " +
-        (libro.barrio ?? "Barcellona"),
-    );
-
-  const shareWhatsappUrl =
-    "https://wa.me/?text=" + encodeURIComponent(shareText);
+  const ownerShare = buildShareLinks(libro, siteUrl, "owner");
+  const visitorShare = buildShareLinks(libro, siteUrl, "visitor");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -139,7 +118,7 @@ export default async function LibroPage({ params, searchParams }: Props) {
               </Link>
               <span className="text-gray-300">|</span>
               <a
-                href={shareUrl}
+                href={ownerShare.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-[#3B6D11] underline underline-offset-2 hover:no-underline"
@@ -148,7 +127,7 @@ export default async function LibroPage({ params, searchParams }: Props) {
               </a>
               <span className="text-gray-300">|</span>
               <a
-                href={shareWhatsappUrl}
+                href={ownerShare.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-[#3B6D11] underline underline-offset-2 hover:no-underline"
@@ -238,6 +217,8 @@ export default async function LibroPage({ params, searchParams }: Props) {
 
             {/* CTA / Not available message */}
             <LibroDetailClient libro={libro} activeLoan={activeLoan} />
+
+            <ShareLibroButton links={visitorShare} />
 
             <GestisciButton libroId={libro.id} />
           </div>
