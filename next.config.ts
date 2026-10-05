@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
+import { COVER_HOSTS } from "./lib/cover-hosts";
 
 // Hosts that the browser is legitimately allowed to talk to.
 // Supabase: il client anon viene usato lato browser (rpc, select).
@@ -40,10 +41,10 @@ const nextConfig: NextConfig = {
     // Allowlist esplicita: le copertine arrivano SOLO da Open Library o dal
     // fallback Google Books (vedi lib/cover-search.ts e lib/isbn-lookup.ts). Il wildcard "**"
     // trasformava /_next/image in un open proxy (SSRF + abuso di banda).
-    remotePatterns: [
-      { protocol: "https", hostname: "covers.openlibrary.org" },
-      { protocol: "https", hostname: "books.google.com" },
-    ],
+    // Open Library risponde con un 302 verso archive.org: next/image segue i
+    // redirect (default 3) senza rivalidare remotePatterns. NON mettere
+    // maximumRedirects: 0 o le copertine Open Library smettono di caricarsi.
+    remotePatterns: COVER_HOSTS.map((hostname) => ({ protocol: "https" as const, hostname })),
   },
   turbopack: {
     root: path.resolve(__dirname),

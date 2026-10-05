@@ -75,6 +75,11 @@ export default function PrivacyPage() {
             servizio. Non utilizziamo cookie di profilazione o tracciamento di terze parti.
             Non è richiesto il tuo consenso per questi cookie.
           </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Il tuo browser conserva in locale (localStorage) i codici per modificare i libri che
+            hai aggiunto e, per comodità, l&apos;ultimo soprannome e contatto che hai usato. Questi
+            dati restano sul tuo dispositivo e puoi cancellarli svuotando i dati del sito.
+          </p>
         </section>
 
         <section className="space-y-3">
