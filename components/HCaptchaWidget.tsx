@@ -21,13 +21,12 @@ declare global {
   }
 }
 
-interface TurnstileWidgetProps {
+interface HCaptchaWidgetProps {
   onToken: (token: string) => void;
   onExpire?: () => void;
 }
 
-// Named TurnstileWidget for import compatibility — now backed by hCaptcha
-export function TurnstileWidget({ onToken, onExpire }: TurnstileWidgetProps) {
+export function HCaptchaWidget({ onToken, onExpire }: HCaptchaWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
