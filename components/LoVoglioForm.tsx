@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Libro, NODI_RITIRO } from "@/lib/types";
 import { createPrestito } from "@/app/actions/prestiti";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { HCaptchaWidget } from "@/components/HCaptchaWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,8 +29,8 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [nodoRitiro, setNodoRitiro] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileKey, setTurnstileKey] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
       return;
     }
 
-    if (!turnstileToken) {
+    if (!captchaToken) {
       setError("Attendere il completamento della verifica di sicurezza.");
       return;
     }
@@ -91,14 +91,14 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         proprietario_tipo: proprietarioTipo,
         messaggio_richiedente: messaggio.trim() || null,
         nodo_ritiro: nodoRitiro || null,
-        captchaToken: turnstileToken,
+        captchaToken,
         honeypot,
       });
 
       if (!result.success) {
         setError(result.error);
-        setTurnstileToken(null);
-        setTurnstileKey((k) => k + 1);
+        setCaptchaToken(null);
+        setCaptchaKey((k) => k + 1);
         setLoading(false);
         return;
       }
@@ -323,10 +323,10 @@ export function LoVoglioForm({ libro, onCancel }: LoVoglioFormProps) {
         autoComplete="off"
       />
 
-      <TurnstileWidget
-        key={turnstileKey}
-        onToken={setTurnstileToken}
-        onExpire={() => setTurnstileToken(null)}
+      <HCaptchaWidget
+        key={captchaKey}
+        onToken={setCaptchaToken}
+        onExpire={() => setCaptchaToken(null)}
       />
 
       {error && (

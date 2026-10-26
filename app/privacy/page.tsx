@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Informativa sulla privacy</h1>
-          <p className="text-sm text-gray-400">Ultimo aggiornamento: marzo 2025</p>
+          <p className="text-sm text-gray-400">Ultimo aggiornamento: ottobre 2026</p>
         </div>
 
         <section className="space-y-3">
@@ -69,11 +69,52 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-gray-900">Cookie</h2>
+          <h2 className="text-base font-semibold text-gray-900">Protezione anti-spam (hCaptcha)</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Questo sito utilizza esclusivamente cookie tecnici necessari al funzionamento del
-            servizio. Non utilizziamo cookie di profilazione o tracciamento di terze parti.
-            Non è richiesto il tuo consenso per questi cookie.
+            Per proteggere da spam e abusi automatici i moduli di inserimento libro e di richiesta
+            prestito usiamo{" "}
+            <a
+              href="https://www.hcaptcha.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#3B6D11] underline underline-offset-2"
+            >
+              hCaptcha
+            </a>
+            , un servizio di Intuition Machines, Inc. (Stati Uniti). Il widget viene caricato solo
+            in questi moduli e può raccogliere indirizzo IP, informazioni su browser e dispositivo
+            e dati di interazione (ad esempio movimenti del mouse o tocchi) per distinguere le
+            persone dai bot.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            La base giuridica è il legittimo interesse a proteggere il servizio da abusi (art.
+            6.1.f GDPR). I dati possono essere trasferiti negli Stati Uniti: Intuition Machines
+            aderisce all&apos;EU-U.S. Data Privacy Framework.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-base font-semibold text-gray-900">Cookie e archiviazione locale</h2>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Questo sito non imposta cookie propri e non utilizza cookie di profilazione, pubblicità
+            o analytics. Usiamo l&apos;archiviazione locale del browser (localStorage) solo per:
+          </p>
+          <ul className="text-sm text-gray-600 leading-relaxed space-y-2 list-disc list-inside">
+            <li>
+              <span className="font-medium text-gray-800">Codici di accesso:</span> salvati quando
+              aggiungi un libro, ti permettono di gestirlo da questo dispositivo.
+            </li>
+            <li>
+              <span className="font-medium text-gray-800">Nickname e avatar:</span> quelli che hai
+              scelto, per precompilare il modulo la volta successiva.
+            </li>
+          </ul>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Questi dati restano sul tuo dispositivo e puoi cancellarli in qualsiasi momento dalle
+            impostazioni del browser. Il widget hCaptcha, presente solo nei moduli, usa cookie
+            tecnici propri necessari alla verifica di sicurezza. Trattandosi di archiviazione
+            necessaria al servizio che richiedi o di preferenze scelte da te, non è richiesto il
+            tuo consenso.
           </p>
           <p className="text-sm text-gray-600 leading-relaxed">
             Il tuo browser conserva in locale (localStorage) i codici per modificare i libri che

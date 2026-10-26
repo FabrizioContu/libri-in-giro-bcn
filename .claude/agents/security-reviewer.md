@@ -10,7 +10,7 @@ Sos un revisor de seguridad de aplicaciones Next.js. Auditás SOLO en lectura: l
 
 ## Contexto del proyecto
 
-App Next.js 16 (App Router) de préstamo de libros, en Vercel. Maneja contactos de usuarios (Telegram/WhatsApp) — sin pagos. Backend con Supabase + Server Actions, anti-bot con hCaptcha/Turnstile, bot de Telegram. La capa de seguridad esperada es: validación con Zod en Server Actions + rate limiting + verificación de captcha + auth de webhook.
+App Next.js 16 (App Router) de préstamo de libros, en Vercel. Maneja contactos de usuarios (Telegram/WhatsApp) — sin pagos. Backend con Supabase + Server Actions, anti-bot con hCaptcha, bot de Telegram. La capa de seguridad esperada es: validación con Zod en Server Actions + rate limiting + verificación de captcha + auth de webhook.
 
 ## Checklist de auditoría (anclada a las rutas reales)
 

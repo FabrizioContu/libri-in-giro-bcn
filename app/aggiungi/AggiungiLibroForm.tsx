@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { GENERI, BARRIOS } from "@/lib/types";
 import { createLibro } from "@/app/actions/libri";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { HCaptchaWidget } from "@/components/HCaptchaWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,8 +54,8 @@ export function AggiungiLibroForm() {
       if (localStorage.getItem("lgbcn_contact_tab") === "altro") setContactTab("altro");
     } catch { /* localStorage non disponibile */ }
   }, []);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileKey, setTurnstileKey] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [honeypot, setHoneypot] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +144,7 @@ export function AggiungiLibroForm() {
       return;
     }
 
-    if (!turnstileToken) {
+    if (!captchaToken) {
       setError("Attendere il completamento della verifica di sicurezza.");
       return;
     }
@@ -169,14 +169,14 @@ export function AggiungiLibroForm() {
       note: form.note.trim() || null,
       nickname: form.nickname.trim() || null,
       avatar_emoji: form.avatar_emoji || null,
-      captchaToken: turnstileToken,
+      captchaToken,
       honeypot,
     });
 
     if (!result.success) {
       setError(result.error);
-      setTurnstileToken(null);
-      setTurnstileKey((k) => k + 1);
+      setCaptchaToken(null);
+      setCaptchaKey((k) => k + 1);
       setLoading(false);
       return;
     }
@@ -503,10 +503,10 @@ export function AggiungiLibroForm() {
         autoComplete="off"
       />
 
-      <TurnstileWidget
-        key={turnstileKey}
-        onToken={setTurnstileToken}
-        onExpire={() => setTurnstileToken(null)}
+      <HCaptchaWidget
+        key={captchaKey}
+        onToken={setCaptchaToken}
+        onExpire={() => setCaptchaToken(null)}
       />
 
       {error && (
