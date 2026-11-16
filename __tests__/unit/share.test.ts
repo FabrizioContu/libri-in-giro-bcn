@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { buildShareLinks } from "@/lib/share";
 
 const SITE = "https://libri.example";
-const libro = {
+const libro: Parameters<typeof buildShareLinks>[0] = {
   id: "abc-123",
   titolo: "Il nome della rosa",
   autore: "Umberto Eco",
