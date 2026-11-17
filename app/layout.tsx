@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { VercelAnalytics } from "@/components/VercelAnalytics";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,6 +55,7 @@ export default function RootLayout({
             FabriDev
           </a>
         </footer>
+        <VercelAnalytics />
       </body>
     </html>
   );

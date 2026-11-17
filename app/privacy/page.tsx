@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 py-10 space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Informativa sulla privacy</h1>
-          <p className="text-sm text-gray-400">Ultimo aggiornamento: ottobre 2026</p>
+          <p className="text-sm text-gray-400">Ultimo aggiornamento: novembre 2026</p>
         </div>
 
         <section className="space-y-3">
@@ -64,8 +64,41 @@ export default function PrivacyPage() {
               organizzare il prestito.
             </li>
             <li>I dati non vengono venduti né condivisi con terze parti a fini commerciali.</li>
-            <li>Non utilizziamo strumenti di tracciamento o analytics.</li>
+            <li>Non utilizziamo strumenti di tracciamento pubblicitario o di profilazione.</li>
           </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-base font-semibold text-gray-900">
+            Statistiche di visita (Vercel Web Analytics)
+          </h2>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Per capire quante persone visitano il sito e quali pagine usano raccogliamo statistiche
+            anonime e aggregate con{" "}
+            <a
+              href="https://vercel.com/docs/analytics/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#3B6D11] underline underline-offset-2"
+            >
+              Vercel Web Analytics
+            </a>
+            , un servizio di Vercel Inc. (Stati Uniti), che è anche il fornitore che ospita il sito.
+            Vengono registrati, ad esempio, la pagina visitata, il sito di provenienza, il paese, il
+            tipo di dispositivo, il browser e il sistema operativo.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Il servizio non usa cookie: per contare le visite usa un identificativo calcolato dalla
+            richiesta, che si azzera ogni giorno, quindi non è possibile seguirti tra giorni o siti
+            diversi. Dell&apos;indirizzo della pagina inviamo solo il percorso e gli eventuali
+            parametri di campagna (utm): i codici di accesso presenti nei link di gestione non
+            vengono mai inviati. Le pagine di amministrazione non vengono misurate.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            La base giuridica è il legittimo interesse a capire come viene usato il servizio per
+            migliorarlo (art. 6.1.f GDPR). I dati possono essere trasferiti negli Stati Uniti:
+            Vercel dichiara di aderire all&apos;EU-U.S. Data Privacy Framework.
+          </p>
         </section>
 
         <section className="space-y-3">
@@ -97,7 +130,8 @@ export default function PrivacyPage() {
           <h2 className="text-base font-semibold text-gray-900">Cookie e archiviazione locale</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
             Questo sito non imposta cookie propri e non utilizza cookie di profilazione, pubblicità
-            o analytics. Usiamo l&apos;archiviazione locale del browser (localStorage) solo per:
+            o analytics (le statistiche di visita funzionano senza cookie). Usiamo
+            l&apos;archiviazione locale del browser (localStorage) solo per:
           </p>
           <ul className="text-sm text-gray-600 leading-relaxed space-y-2 list-disc list-inside">
             <li>
